@@ -148,7 +148,7 @@ function filterApiResponseData(metric, data, blacklistSet = createBlacklistSet()
 app.get('/config', (req, res) => {
     const blackList = parseBlacklist(process.env.BLACK_LIST);
     res.json({
-        siteName: process.env.SITE_NAME || '清羽飞扬流量分析',
+        siteName: process.env.SITE_NAME || '伴随流量分析',
         siteIcon: process.env.SITE_ICON || '/favicon.png',
         icp: process.env.ICP || '陕ICP备2024028531号',
         blackList

@@ -98,7 +98,7 @@ http://localhost:8088
 ```env
 SECRET_ID=your_tencentcloud_secret_id
 SECRET_KEY=your_tencentcloud_secret_key
-SITE_NAME=清羽飞扬流量分析
+SITE_NAME=伴随流量分析
 SITE_ICON=/favicon.png
 ICP=陕ICP备2024028531号
 BLACK_LIST=["xxx.example.com","xxx2.example.com"]
@@ -108,7 +108,7 @@ BLACK_LIST=["xxx.example.com","xxx2.example.com"]
 | --- | --- | --- | --- |
 | `SECRET_ID` | 是 | `your_tencentcloud_secret_id` | 腾讯云 API 访问密钥 SecretId，用于服务端请求 EdgeOne 接口。 |
 | `SECRET_KEY` | 是 | `your_tencentcloud_secret_key` | 腾讯云 API 访问密钥 SecretKey，请勿提交到公开仓库。 |
-| `SITE_NAME` | 否 | `清羽飞扬流量分析` | 页面标题和站点显示名称，可改成自己的面板名称。 |
+| `SITE_NAME` | 否 | `伴随流量分析` | 页面标题和站点显示名称，可改成自己的面板名称。 |
 | `SITE_ICON` | 否 | `/favicon.png` | 页面图标地址，默认使用项目根目录下的 `favicon.png`。 |
 | `ICP` | 否 | `陕ICP备2024028531号` | 页脚展示的备案号，不需要展示时可留空。 |
 | `BLACK_LIST` | 否 | `["xxx.example.com","xxx2.example.com"]` | 域名黑名单，用于隐藏或过滤不希望展示的域名数据，建议使用 JSON 数组格式。 |
