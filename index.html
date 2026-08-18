@@ -929,7 +929,7 @@
                             <button onclick="setTimeRange('7d')" class="time-range-btn" data-value="7d">七天</button>
                             <button onclick="setTimeRange('31d')" class="time-range-btn" data-value="31d">31天</button>
                         </div>
-                        <input type="hidden" id="timeRange" value="1h">
+                        <input type="hidden" id="timeRange" value="today">
                     </div>
                     <div class="control-card rounded-2xl p-4">
                         <label for="zoneId-trigger" class="mb-3 block text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">选择站点</label>
@@ -2232,7 +2232,8 @@
 
         async function initDashboard() {
 
-            await configReady;
+            // /api/config 只负责站点配置，不阻塞 Dashboard 初始化。
+            // 即使 config 较慢、异常或被缓存卡住，标签和数据查询也应该可以正常工作。
             // Initialize charts
             chartTraffic = initChart('chart_traffic');
             chartBandwidth = initChart('chart_bandwidth');
@@ -2266,7 +2267,7 @@
             chartFunctionCpu = initChart('chart_function_cpu');
 
             // 初始化时间范围按钮样式（不刷新数据）
-            setTimeRange('today', false);
+            setTimeRange('today', false); // 页面首次进入默认查询“当天”
             initCustomSelects();
             initThemeSwitcher();
             initDashboardTabs();
@@ -2303,18 +2304,24 @@
             document.getElementById('chart_top_url') && resizeObserver.observe(document.getElementById('chart_top_url'));
             document.getElementById('chart_top_request_url') && resizeObserver.observe(document.getElementById('chart_top_request_url'));
             
-            await fetchZones(); // Fetch zones first
             clearDashboardCache();
 
-            // 初始化默认分组：只请求“概览”所需数据。
-            // 其他分组在用户首次点击时才请求。
-            console.info('[Dashboard] initialization complete, loading overview...');
+            // 站点列表和 Dashboard 数据并行加载。
+            // 不能因为 /api/zones 较慢而让首页完全没有数据请求。
+            const zonesPromise = fetchZones();
+
+            // 默认时间范围已经在页面和 setTimeRange() 中明确设为“当天”。
+            // 首页只请求概览组；其它组首次点击时才请求。
+            console.info('[Dashboard] initialization complete, loading today overview...');
             await refreshData(true);
+
+            // 站点列表失败不会影响概览数据。
+            await zonesPromise;
         }
 
         const dashboardCache = new Map();
         let activeDashboardGroup = 'overview';
-        let dashboardLoading = false;
+        const dashboardLoadingGroups = new Set();
         const dashboardGroupMeta = {
             overview: ['核心站点概览','流量、带宽、请求与性能指标。'],
             security: ['安全分析','防护拦截与安全趋势。'],
@@ -2356,7 +2363,15 @@
             if (desc) desc.textContent = meta[1] + ' 数据在首次进入后缓存。';
         }
 
-        function clearDashboardCache() { dashboardCache.clear(); }
+        function clearDashboardCache() {
+            dashboardCache.clear();
+        }
+
+        // 当前查询条件发生变化时，旧缓存不能继续复用。
+        function invalidateDashboardData() {
+            clearDashboardCache();
+            setGroupState('', '待加载');
+        }
 
         function renderTimeMetricChart(chart, results, metrics, formatter) {
             if (!chart) return;
@@ -2394,14 +2409,19 @@
         }
 
         async function loadDashboardGroup(group, force=false) {
-            if (dashboardLoading) return;
-            const key=group;
+            const key = group;
+
             if (!force && dashboardCache.has(key)) {
-                applyDashboardResults(group,dashboardCache.get(key));
+                applyDashboardResults(group, dashboardCache.get(key));
                 setGroupState('loaded','已缓存');
                 return;
             }
-            dashboardLoading=true;
+
+            // 不再使用全局 loading 锁。
+            // 用户可以在“概览”请求进行时直接切换到其它分组。
+            if (dashboardLoadingGroups.has(group)) return;
+
+            dashboardLoadingGroups.add(group);
             setGroupState('loading','加载中...');
             const {startTime,endTime}=calculateTimeRange();
             const start=new Date(startTime),end=new Date(endTime);
@@ -2423,9 +2443,11 @@
                 applyDashboardResults(group,results);
                 setGroupState('loaded','加载完成');
             } catch(err) {
-                console.error('Dashboard group load error:',err);
+                console.error(`Dashboard group load error [${group}]:`,err);
                 setGroupState('error','加载失败');
-            } finally { dashboardLoading=false; }
+            } finally {
+                dashboardLoadingGroups.delete(group);
+            }
         }
 
         function applyDashboardResults(group,results){
@@ -2438,13 +2460,30 @@
         }
 
         async function switchDashboardGroup(group,force=false){
-            activeDashboardGroup=group;
-            document.querySelectorAll('.dashboard-tab[data-group]').forEach(btn=>{const active=btn.dataset.group===group;btn.classList.toggle('is-active',active);btn.setAttribute('aria-selected',active?'true':'false')});
-            document.querySelectorAll('.dashboard-panel[data-panel]').forEach(panel=>panel.classList.toggle('is-active',panel.dataset.panel===group));
+            if (!dashboardGroupMeta[group]) return;
+
+            activeDashboardGroup = group;
+
+            document.querySelectorAll('.dashboard-tab[data-group]').forEach(btn => {
+                const active = btn.dataset.group === group;
+                btn.classList.toggle('is-active', active);
+                btn.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+
+            document.querySelectorAll('.dashboard-panel[data-panel]').forEach(panel => {
+                panel.classList.toggle('is-active', panel.dataset.panel === group);
+            });
+
             updateGroupCaption(group);
+
+            // 先完成视觉切换，再请求当前分组数据。
             await new Promise(requestAnimationFrame);
-            await loadDashboardGroup(group,force);
-            resizeDashboardCharts();
+
+            try {
+                await loadDashboardGroup(group, force);
+            } finally {
+                resizeDashboardCharts();
+            }
         }
 
         async function refreshData(force=true){
@@ -2454,28 +2493,20 @@
 
         function initDashboardTabs(){
             const tabs = document.querySelectorAll('.dashboard-tab[data-group]');
-            console.info(`[Dashboard] binding ${tabs.length} group tabs`);
-
-            tabs.forEach(btn => {
-                btn.addEventListener('click', async (event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    const group = btn.dataset.group;
-                    if (!group) return;
-
-                    console.info(`[Dashboard] switch group -> ${group}`);
-                    await switchDashboardGroup(group);
-                });
-            });
+            console.info(`[Dashboard] ${tabs.length} group tabs detected`);
 
             const refreshButton = document.getElementById('dashboard-refresh');
-            if (refreshButton) {
+            if (refreshButton && !refreshButton.dataset.bound) {
+                refreshButton.dataset.bound = '1';
                 refreshButton.addEventListener('click', async (event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     console.info(`[Dashboard] refresh group -> ${activeDashboardGroup}`);
-                    await refreshData(true);
+                    try {
+                        await refreshData(true);
+                    } catch (err) {
+                        console.error('[Dashboard] refresh failed:', err);
+                    }
                 });
             }
         }
@@ -4021,11 +4052,34 @@
         }
         /** 神秘降级方案结束 **/
 
+        // Dashboard 标签使用事件委托，确保即使某个图表/初始化步骤异常，
+        // 标签仍然可以点击切换。
+        document.addEventListener('click', async (event) => {
+            const btn = event.target.closest('.dashboard-tab[data-group]');
+            if (!btn) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const group = btn.dataset.group;
+            if (!group) return;
+
+            console.info(`[Dashboard] click group -> ${group}`);
+            try {
+                await switchDashboardGroup(group);
+            } catch (err) {
+                console.error(`[Dashboard] switch group failed: ${group}`, err);
+            }
+        }, true);
+
         // Handle Resize
         window.addEventListener('resize', resizeDashboardCharts);
 
         // Start - Entrance
-        initDashboard();
+        initDashboard().catch(err => {
+            console.error('[Dashboard] initialization failed:', err);
+            setGroupState('error', '初始化失败，请查看控制台');
+        });
     </script>
 <div class="mouse-spotlight" id="mouse-spotlight"></div>
 <script>
