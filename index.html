@@ -698,6 +698,33 @@
         html[data-theme="dark"] [class*="border-b"] {
             border-color: rgba(71, 85, 105, 0.48) !important;
         }
+    
+
+/* Dashboard group navigation */
+.dashboard-tabs{position:sticky;top:.75rem;z-index:90;overflow-x:auto;scrollbar-width:none;background:rgba(255,255,255,.82);border:1px solid rgba(226,232,240,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 16px 40px -30px rgba(15,23,42,.45);padding:.45rem;border-radius:1.15rem}
+.dashboard-tabs::-webkit-scrollbar{display:none}
+.dashboard-tab{position:relative;display:inline-flex;align-items:center;gap:.48rem;white-space:nowrap;border:1px solid transparent;border-radius:.85rem;padding:.58rem .82rem;font-size:.82rem;font-weight:650;color:#64748b;transition:all .22s ease;cursor:pointer;background:transparent}
+.dashboard-tab:hover{color:#0f172a;background:rgba(248,250,252,.95);transform:translateY(-1px)}
+.dashboard-tab.is-active{color:#0f172a;background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(240,249,255,.96));border-color:rgba(125,211,252,.48);box-shadow:0 10px 26px -20px rgba(14,165,233,.75),inset 0 0 0 1px rgba(255,255,255,.75)}
+.dashboard-tab .tab-dot{width:.42rem;height:.42rem;border-radius:999px;background:#cbd5e1;transition:all .2s ease}
+.dashboard-tab.is-active .tab-dot{background:#0ea5e9;transform:scale(1.2);box-shadow:0 0 0 4px rgba(14,165,233,.1)}
+.dashboard-panel{display:none;animation:dashboardPanelIn .28s ease both}
+.dashboard-panel.is-active{display:block}
+@keyframes dashboardPanelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.group-state{display:inline-flex;align-items:center;gap:.5rem;padding:.48rem .72rem;border-radius:.8rem;background:rgba(248,250,252,.78);color:#64748b;font-size:.74rem;font-weight:650}
+.group-state .state-dot{width:.45rem;height:.45rem;border-radius:999px;background:#94a3b8}
+.group-state.loading .state-dot{background:#0ea5e9;animation:dashboardPulse 1s infinite}
+.group-state.loaded .state-dot{background:#22c55e}
+.group-state.error .state-dot{background:#ef4444}
+@keyframes dashboardPulse{50%{opacity:.35;transform:scale(.72)}}
+.dashboard-info{border:1px solid rgba(226,232,240,.75);background:rgba(255,255,255,.45);border-radius:1rem;padding:.65rem .8rem}
+.dashboard-card-note{font-size:.72rem;color:#94a3b8;margin-top:.15rem}
+.mouse-spotlight{position:fixed;left:0;top:0;width:360px;height:360px;border-radius:50%;pointer-events:none;z-index:0;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(56,189,248,.12),transparent 68%);opacity:0;transition:opacity .25s ease}
+.app-shell{position:relative;overflow:visible;--mx:50%;--my:0%}
+.app-shell::after{content:'';position:absolute;inset:0;border-radius:28px;pointer-events:none;background:radial-gradient(430px circle at var(--mx) var(--my),rgba(56,189,248,.065),transparent 68%);z-index:0}
+.app-shell>*{position:relative;z-index:1}
+@media(max-width:640px){.dashboard-tab{padding:.52rem .7rem;font-size:.78rem}.dashboard-tabs{top:.4rem}.mouse-spotlight{display:none}}
+
     </style>
     <script>
         // Fetch config immediately
@@ -834,62 +861,6 @@
             --ring: 222.2 84% 4.9%;
             --radius: 0.5rem;
         }
-
-        /* Dashboard tabs */
-        .dashboard-tabs {
-            position: relative;
-            overflow-x: auto;
-            scrollbar-width: none;
-            padding: 0.35rem;
-            border: 1px solid rgba(226,232,240,.82);
-            background: rgba(255,255,255,.72);
-            box-shadow: 0 18px 48px -38px rgba(15,23,42,.35);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-        }
-        .dashboard-tabs::-webkit-scrollbar { display:none; }
-        .dashboard-tab {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            gap: .55rem;
-            min-height: 2.8rem;
-            padding: .55rem .9rem;
-            border-radius: .95rem;
-            color: #64748b;
-            font-size: .86rem;
-            font-weight: 700;
-            white-space: nowrap;
-            transition: transform .2s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
-        }
-        .dashboard-tab:hover { color:#0f172a; background:rgba(248,250,252,.9); transform:translateY(-1px); }
-        .dashboard-tab.is-active {
-            color:#0f172a;
-            background:linear-gradient(135deg,rgba(255,255,255,.98),rgba(240,249,255,.95));
-            box-shadow:0 10px 26px -18px rgba(14,165,233,.75), inset 0 0 0 1px rgba(125,211,252,.38);
-        }
-        .dashboard-tab .tab-dot { width:.42rem; height:.42rem; border-radius:999px; background:#cbd5e1; transition:background .2s ease, transform .2s ease; }
-        .dashboard-tab.is-active .tab-dot { background:#0ea5e9; transform:scale(1.18); box-shadow:0 0 0 4px rgba(14,165,233,.10); }
-        .dashboard-panel { display:none; animation: panelIn .28s ease both; }
-        .dashboard-panel.is-active { display:block; }
-        @keyframes panelIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
-        .group-state {
-            display:flex; align-items:center; gap:.55rem; padding:.55rem .75rem; border-radius:.8rem;
-            background:rgba(248,250,252,.78); color:#64748b; font-size:.75rem; font-weight:600;
-        }
-        .group-state .state-dot { width:.45rem; height:.45rem; border-radius:999px; background:#94a3b8; }
-        .group-state.loading .state-dot { background:#0ea5e9; animation:pulseDot 1s infinite; }
-        .group-state.loaded .state-dot { background:#22c55e; }
-        .group-state.error .state-dot { background:#ef4444; }
-        @keyframes pulseDot { 50% { opacity:.35; transform:scale(.72); } }
-        .mouse-spotlight { pointer-events:none; position:fixed; z-index:0; width:420px; height:420px; border-radius:50%; transform:translate(-50%,-50%); background:radial-gradient(circle,rgba(56,189,248,.11),transparent 68%); filter:blur(3px); opacity:0; transition:opacity .25s ease; }
-        .app-shell { --mx:50%; --my:0%; }
-        .app-shell::after { content:''; position:absolute; pointer-events:none; inset:0; border-radius:28px; background:radial-gradient(420px circle at var(--mx) var(--my),rgba(56,189,248,.075),transparent 68%); opacity:.9; }
-        .app-shell { position:relative; }
-        @media (max-width: 640px) {
-            .dashboard-tab { padding:.5rem .72rem; font-size:.8rem; }
-            .dashboard-tabs { margin-left:-.15rem; margin-right:-.15rem; }
-        }
     </style>
 </head>
 <body class="min-h-screen px-3 py-4 sm:px-5 lg:px-7">
@@ -939,9 +910,57 @@
                             <div class="rounded-xl border border-slate-200/90 bg-slate-50/90 p-3 text-center shadow-sm">
                                 <p class="text-[11px] uppercase tracking-[0.18em] text-slate-400">筛选</p>
                                 <p class="mt-1 text-base font-semibold text-slate-900">3 类</p>
-                         <!-- Main Content -->
+                            </div>
+                            <div class="rounded-xl border border-sky-200/90 bg-sky-50/90 p-3 text-center shadow-sm">
+                                <p class="text-[11px] uppercase tracking-[0.18em] text-slate-400">文档</p>
+                                <p class="mt-1 text-base font-semibold text-slate-900">可查阅</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-3 xl:grid-cols-[minmax(0,1fr)_240px_240px]">
+                    <div class="control-card rounded-2xl p-4">
+                        <label class="mb-3 block text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">时间范围</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="setTimeRange('1h')" class="time-range-btn" data-value="1h">1小时</button>
+                            <button onclick="setTimeRange('today')" class="time-range-btn" data-value="today">当天</button>
+                            <button onclick="setTimeRange('yesterday')" class="time-range-btn" data-value="yesterday">昨天</button>
+                            <button onclick="setTimeRange('7d')" class="time-range-btn" data-value="7d">七天</button>
+                            <button onclick="setTimeRange('31d')" class="time-range-btn" data-value="31d">31天</button>
+                        </div>
+                        <input type="hidden" id="timeRange" value="1h">
+                    </div>
+                    <div class="control-card rounded-2xl p-4">
+                        <label for="zoneId-trigger" class="mb-3 block text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">选择站点</label>
+                        <input type="hidden" id="zoneId" value="*">
+                        <div class="custom-select" data-select="zoneId">
+                            <button type="button" id="zoneId-trigger" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span data-select-label>加载中...</span>
+                                <span class="custom-select-icon"></span>
+                            </button>
+                            <div class="custom-select-menu" id="zoneId-menu" role="listbox"></div>
+                        </div>
+                    </div>
+                    <div class="control-card rounded-2xl p-4">
+                        <label for="hostId-trigger" class="mb-3 block text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">选择域名</label>
+                        <input type="hidden" id="hostId" value="*">
+                        <div class="custom-select" data-select="hostId">
+                            <button type="button" id="hostId-trigger" class="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+                                <span data-select-label>全部域名</span>
+                                <span class="custom-select-icon"></span>
+                            </button>
+                            <div class="custom-select-menu" id="hostId-menu" role="listbox"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
         <div class="space-y-5 pt-2" id="dashboard-root">
-            <div class="dashboard-tabs rounded-[22px] sticky top-3 z-[90]" id="dashboard-tabs" role="tablist" aria-label="数据分析分组">
+
+            <div class="dashboard-tabs" id="dashboard-tabs" role="tablist" aria-label="数据分析分组">
                 <div class="flex min-w-max items-center gap-1">
                     <button class="dashboard-tab is-active" data-group="overview" role="tab" aria-selected="true"><span class="tab-dot"></span>概览</button>
                     <button class="dashboard-tab" data-group="security" role="tab" aria-selected="false"><span class="tab-dot"></span>安全</button>
@@ -953,18 +972,14 @@
                     <button id="dashboard-refresh" class="dashboard-tab" type="button" title="刷新当前分组"><span class="text-base">↻</span>刷新</button>
                 </div>
             </div>
-
             <div class="flex flex-wrap items-center justify-between gap-3 px-1">
-                <div>
-                    <p id="group-caption" class="text-sm font-semibold text-slate-700">核心站点概览</p>
-                    <p id="group-description" class="mt-1 text-xs text-slate-400">只加载当前分组需要的数据，首次进入后自动缓存。</p>
-                </div>
+                <div><p id="group-caption" class="text-sm font-semibold text-slate-700">核心站点概览</p><p id="group-description" class="mt-1 text-xs text-slate-400">只加载当前分组需要的数据，首次进入后自动缓存。</p></div>
                 <div id="group-state" class="group-state"><span class="state-dot"></span><span>等待加载</span></div>
             </div>
 
             <div class="dashboard-panel is-active" data-panel="overview" role="tabpanel">
-                <div class="space-y-5">
-                    <!-- Section 1: Traffic (流量) -->
+                <div class="space-y-8 pt-2">
+<!-- Section 1: Traffic (流量) -->
             <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
                 <h2 class="text-lg font-bold text-slate-800 section-title flex items-center gap-2">
                     <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1035,9 +1050,7 @@
                     </div>
                 </div>
             </div>
-
-            
-                    <!-- Section 2: Bandwidth (带宽) -->
+<!-- Section 2: Bandwidth (带宽) -->
             <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
                 <h2 class="text-lg font-bold text-slate-800 section-title flex items-center gap-2">
                     <svg class="h-5 w-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1108,9 +1121,7 @@
                     </div>
                 </div>
             </div>
-
-            
-                    <!-- Section 4: Requests & Performance (请求与性能) -->
+<!-- Section 4: Requests & Performance (请求与性能) -->
             <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
                 <h2 class="text-lg font-bold text-slate-800 section-title flex items-center gap-2">
                     <svg class="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1192,13 +1203,12 @@
                     </div>
                 </div>
             </div>
-
-            
                 </div>
             </div>
 
             <div class="dashboard-panel" data-panel="security" role="tabpanel">
-                <!-- Section 6: Security Analysis (安全分析) -->
+                <div class="space-y-8 pt-2">
+<!-- Section 6: Security Analysis (安全分析) -->
             <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
                 <h2 class="text-lg font-bold text-slate-800 section-title flex items-center gap-2">
                     <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1247,88 +1257,181 @@
                     </div>
                 </div>
             </div>
-
-            
+                </div>
             </div>
 
             <div class="dashboard-panel" data-panel="access" role="tabpanel">
-                <div class="space-y-5">
-                    <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
-                        <div class="flex flex-wrap items-end justify-between gap-3">
-                            <div>
-                                <h2 class="text-lg font-bold text-slate-800 section-title">全球与地域</h2>
-                                <p class="mt-2 text-xs text-slate-400">国家、地区与中国省份的请求分布。</p>
-                            </div>
-                            <span class="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-600">TOP 10</span>
-                        </div>
-                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">全球请求分布</h3></div><div class="p-5"><div id="chart_top_map" class="w-full h-[400px] min-h-[330px]"></div></div></div>
-                        <div class="grid gap-4 lg:grid-cols-2">
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">国家 / 地区</h3></div><div class="p-5"><div id="chart_top_request_country" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">中国省份</h3></div><div class="p-5"><div id="chart_top_request_province" class="w-full h-[300px]"></div></div></div>
-                        </div>
+                <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div><h2 class="text-lg font-bold text-slate-800 section-title flex items-center gap-2">访问分析</h2><p class="mt-2 text-sm text-slate-500">国家、地区、设备、浏览器与操作系统分布。</p></div>
+                        <span class="dashboard-info text-xs text-slate-500">首次进入本分组时加载</span>
                     </div>
-                    <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
-                        <div><h2 class="text-lg font-bold text-slate-800 section-title">客户端画像</h2><p class="mt-2 text-xs text-slate-400">设备、浏览器、操作系统与 User-Agent。</p></div>
-                        <div class="grid gap-4 lg:grid-cols-2">
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">设备类型</h3></div><div class="p-5"><div id="chart_top_request_ua_device" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">浏览器</h3></div><div class="p-5"><div id="chart_top_request_ua_browser" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">操作系统</h3></div><div class="p-5"><div id="chart_top_request_ua_os" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">User-Agent</h3></div><div class="p-5"><div id="chart_top_request_ua" class="w-full h-[330px]"></div></div></div>
+<div class="chart-card rounded-[22px]">
+                    <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                        <div class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                         </div>
+                        <h3 class="font-semibold text-slate-800">全球请求分布</h3>
+                    </div>
+                    <div class="p-5">
+                        <div id="chart_top_map" class="w-full h-[400px] min-h-[350px]"></div>
+                    </div>
+                </div>
+
+                
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">国家 / 地区流量 TOP10</h3></div><div class="p-5"><div id="chart_top_country" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">中国省份流量 TOP10</h3></div><div class="p-5"><div id="chart_top_province" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">设备类型</h3></div><div class="p-5"><div id="chart_top_ua_device" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">浏览器</h3></div><div class="p-5"><div id="chart_top_ua_browser" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">操作系统</h3></div><div class="p-5"><div id="chart_top_ua_os" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">User-Agent TOP10</h3></div><div class="p-5"><div id="chart_top_ua" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">请求国家 / 地区 TOP10</h3></div><div class="p-5"><div id="chart_top_request_country" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">请求省份 TOP10</h3></div><div class="p-5"><div id="chart_top_request_province" class="w-full h-[280px]"></div></div></div>
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-panel" data-panel="requests" role="tabpanel">
-                <div class="space-y-5">
-                    <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
-                        <div><h2 class="text-lg font-bold text-slate-800 section-title">请求与响应</h2><p class="mt-2 text-xs text-slate-400">状态码、资源类型、域名、URL 与客户端信息。</p></div>
-                        <div class="grid gap-4 lg:grid-cols-2">
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">响应状态码</h3></div><div class="p-5"><div id="chart_top_status_code" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">请求状态码</h3></div><div class="p-5"><div id="chart_top_request_status_code" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">域名流量</h3></div><div class="p-5"><div id="chart_top_domain" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">域名请求</h3></div><div class="p-5"><div id="chart_top_request_domain" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">URL 流量</h3></div><div class="p-5"><div id="chart_top_url" class="w-full h-[330px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">URL 请求</h3></div><div class="p-5"><div id="chart_top_request_url" class="w-full h-[330px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">资源类型</h3></div><div class="p-5"><div id="chart_top_request_resource_type" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">客户端 IP</h3></div><div class="p-5"><div id="chart_top_request_sip" class="w-full h-[300px]"></div></div></div>
-                            <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100/80"><h3 class="font-semibold text-slate-800">Referer</h3></div><div class="p-5"><div id="chart_top_request_referer" class="w-full h-[330px]"></div></div></div>
+                <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800 section-title flex items-center gap-2">请求分析</h2>
+                            <p class="mt-2 text-sm text-slate-500">状态码、域名、URL、资源类型、客户端 IP 与 Referer。</p>
                         </div>
+                    </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                    <!-- Status Code -->
+                    <div class="chart-card rounded-[22px]">
+                        <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">状态码流量排行</h3>
+                        </div>
+                        <div class="p-5">
+                            <div id="chart_top_status_code" class="w-full h-[240px] min-h-[200px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Status Code Requests -->
+                    <div class="chart-card rounded-[22px]">
+                        <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">状态码请求数排行</h3>
+                        </div>
+                        <div class="p-5">
+                            <div id="chart_top_request_status_code" class="w-full h-[240px] min-h-[200px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Domain -->
+                    <div class="chart-card rounded-[22px]">
+                        <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">域名流量排行</h3>
+                        </div>
+                        <div class="p-5">
+                            <div id="chart_top_domain" class="w-full h-[240px] min-h-[200px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Domain Requests -->
+                    <div class="chart-card rounded-[22px]">
+                        <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-cyan-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">域名请求数排行</h3>
+                        </div>
+                        <div class="p-5">
+                            <div id="chart_top_request_domain" class="w-full h-[240px] min-h-[200px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- URL -->
+                    <div class="chart-card rounded-[22px]">
+                        <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">URL 流量排行</h3>
+                        </div>
+                        <div class="p-5">
+                            <div id="chart_top_url" class="w-full h-[240px] min-h-[200px]"></div>
+                        </div>
+                    </div>
+
+                    <!-- URL Requests -->
+                    <div class="chart-card rounded-[22px]">
+                        <div class="p-5 border-b border-slate-100 flex items-center gap-2">
+                            <div class="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/>
+                                </svg>
+                            </div>
+                            <h3 class="font-semibold text-slate-800">URL 请求数排行</h3>
+                        </div>
+                        <div class="p-5">
+                            <div id="chart_top_request_url" class="w-full h-[240px] min-h-[200px]"></div>
+                        </div>
+                    </div>
+                </div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">资源类型请求 TOP10</h3></div><div class="p-5"><div id="chart_top_request_resource_type" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">客户端 IP TOP10</h3></div><div class="p-5"><div id="chart_top_request_sip" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">Referer TOP10</h3></div><div class="p-5"><div id="chart_top_request_referer" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">请求资源类型（流量）</h3></div><div class="p-5"><div id="chart_top_resource_type" class="w-full h-[280px]"></div></div></div>
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-panel" data-panel="origin" role="tabpanel">
                 <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
-                    <div><h2 class="text-lg font-bold text-slate-800 section-title">源站回源分析</h2><p class="mt-2 text-xs text-slate-400">EdgeOne 回源请求、回源流量与带宽趋势。</p></div>
+                    <div><h2 class="text-lg font-bold text-slate-800 section-title">源站回源</h2><p class="mt-2 text-sm text-slate-500">查看 EdgeOne 到源站的请求、流量和带宽压力。</p></div>
                     <div class="grid gap-4 md:grid-cols-3">
-                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">回源流量</p><p id="kpi_l7Flow_outFlux_hy" class="mt-1 text-2xl font-bold text-slate-900">加载中...</p><p class="mt-3 text-xs text-slate-400">Origin Out Flux</p></div>
-                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">回源请求数</p><p id="kpi_l7Flow_request_hy" class="mt-1 text-2xl font-bold text-slate-900">加载中...</p><p class="mt-3 text-xs text-slate-400">Origin Requests</p></div>
-                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">回源带宽峰值</p><p id="kpi_l7Flow_outBandwidth_hy" class="mt-1 text-2xl font-bold text-slate-900">加载中...</p><p class="mt-3 text-xs text-slate-400">Origin Out Bandwidth</p></div>
+                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">回源流量</p><p id="kpi_l7Flow_outFlux_hy" class="mt-1 text-2xl font-bold text-slate-900">等待加载</p><p class="dashboard-card-note">Out Flux</p></div>
+                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">回源带宽</p><p id="kpi_l7Flow_outBandwidth_hy" class="mt-1 text-2xl font-bold text-slate-900">等待加载</p><p class="dashboard-card-note">Out Bandwidth</p></div>
+                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">回源请求数</p><p id="kpi_l7Flow_request_hy" class="mt-1 text-2xl font-bold text-slate-900">等待加载</p><p class="dashboard-card-note">Origin Requests</p></div>
                     </div>
-                    <div class="grid gap-4 lg:grid-cols-2">
-                        <div class="chart-card rounded-[22px] p-5"><h3 class="mb-4 font-semibold text-slate-800">回源流量趋势</h3><div id="chart_origin_traffic" class="h-[320px]"></div></div>
-                        <div class="chart-card rounded-[22px] p-5"><h3 class="mb-4 font-semibold text-slate-800">回源带宽趋势</h3><div id="chart_origin_bandwidth" class="h-[320px]"></div></div>
-                        <div class="chart-card rounded-[22px] p-5"><h3 class="mb-4 font-semibold text-slate-800">回源请求趋势</h3><div id="chart_origin_requests" class="h-[320px]"></div></div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="chart-card rounded-[22px] p-5"><h3 class="font-semibold text-slate-800">回源流量趋势</h3><div id="chart_origin_flux" class="mt-4 h-[300px]"></div></div>
+                        <div class="chart-card rounded-[22px] p-5"><h3 class="font-semibold text-slate-800">回源带宽趋势</h3><div id="chart_origin_bandwidth" class="mt-4 h-[300px]"></div></div>
                     </div>
                 </div>
             </div>
 
             <div class="dashboard-panel" data-panel="functions" role="tabpanel">
                 <div class="section-block space-y-5 rounded-[24px] p-4 sm:p-5">
-                    <div><h2 class="text-lg font-bold text-slate-800 section-title">Edge Functions</h2><p class="mt-2 text-xs text-slate-400">函数请求量与 CPU 消耗时间。</p></div>
+                    <div><h2 class="text-lg font-bold text-slate-800 section-title">Edge Functions</h2><p class="mt-2 text-sm text-slate-500">函数调用次数与 CPU 消耗。</p></div>
                     <div class="grid gap-4 md:grid-cols-2">
-                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">函数请求数</p><p id="kpi_function_requestCount" class="mt-1 text-2xl font-bold text-slate-900">加载中...</p></div>
-                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">CPU 消耗时间</p><p id="kpi_function_cpuCostTime" class="mt-1 text-2xl font-bold text-slate-900">加载中...</p></div>
+                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">函数请求数</p><p id="kpi_function_requestCount" class="mt-1 text-2xl font-bold text-slate-900">等待加载</p></div>
+                        <div class="metric-card rounded-[22px] p-5"><p class="text-sm font-medium text-slate-500">CPU 消耗时间</p><p id="kpi_function_cpuCostTime" class="mt-1 text-2xl font-bold text-slate-900">等待加载</p></div>
                     </div>
-                    <div class="grid gap-4 lg:grid-cols-2">
-                        <div class="chart-card rounded-[22px] p-5"><h3 class="mb-4 font-semibold text-slate-800">函数请求趋势</h3><div id="chart_function_requests" class="h-[320px]"></div></div>
-                        <div class="chart-card rounded-[22px] p-5"><h3 class="mb-4 font-semibold text-slate-800">CPU 消耗趋势</h3><div id="chart_function_cpu" class="h-[320px]"></div></div>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div class="chart-card rounded-[22px] p-5"><h3 class="font-semibold text-slate-800">函数请求趋势</h3><div id="chart_function_requests" class="mt-4 h-[320px]"></div></div>
+                        <div class="chart-card rounded-[22px] p-5"><h3 class="font-semibold text-slate-800">CPU 消耗趋势</h3><div id="chart_function_cpu" class="mt-4 h-[320px]"></div></div>
                     </div>
                 </div>
             </div>
-        </div>
 
+        </div>
 
         <!-- Footer -->
         <div class="glass-panel footer-panel rounded-[22px] px-5 py-5 text-sm text-slate-500">
@@ -1363,6 +1466,8 @@
         let chartPerformance = null;
         let chartSecurity = null;
         let chartTopMap = null;
+        let chartTopCountry = null;
+        let chartTopRequestCountry = null;
         let chartTopProvince = null;
         let chartTopStatusCode = null;
         let chartTopRequestStatusCode = null;
@@ -1385,11 +1490,8 @@
         let chartTopRequestUaBrowser = null;
         let chartTopRequestUaOs = null;
         let chartTopRequestUa = null;
-        let chartTopCountry = null;
-        let chartTopRequestCountry = null;
-        let chartOriginTraffic = null;
+        let chartOriginFlux = null;
         let chartOriginBandwidth = null;
-        let chartOriginRequests = null;
         let chartFunctionRequests = null;
         let chartFunctionCpu = null;
 
@@ -1411,13 +1513,11 @@
         function refreshChartsForTheme() {
             const charts = [
                 chartTraffic, chartBandwidth, chartRequests, chartPerformance, chartSecurity,
-                chartTopMap, chartTopCountry, chartTopProvince, chartTopRequestCountry, chartTopRequestProvince,
-                chartTopStatusCode, chartTopRequestStatusCode, chartTopDomain, chartTopRequestDomain,
-                chartTopUrl, chartTopRequestUrl, chartTopResourceType, chartTopRequestResourceType,
-                chartTopSip, chartTopRequestSip, chartTopReferer, chartTopRequestReferer,
-                chartTopUaDevice, chartTopRequestUaDevice, chartTopUaBrowser, chartTopRequestUaBrowser,
-                chartTopUaOs, chartTopRequestUaOs, chartTopUa, chartTopRequestUa,
-                chartOriginTraffic, chartOriginBandwidth, chartOriginRequests, chartFunctionRequests, chartFunctionCpu
+                chartTopMap, chartTopCountry, chartTopProvince, chartTopUaDevice, chartTopUaBrowser, chartTopUaOs, chartTopUa,
+                chartTopRequestCountry, chartTopRequestProvince, chartTopStatusCode, chartTopRequestStatusCode,
+                chartTopDomain, chartTopRequestDomain, chartTopUrl, chartTopRequestUrl, chartTopResourceType,
+                chartTopRequestResourceType, chartTopSip, chartTopRequestSip, chartTopReferer, chartTopRequestReferer,
+                chartOriginFlux, chartOriginBandwidth, chartFunctionRequests, chartFunctionCpu
             ];
             charts.forEach(chart => {
                 if (!chart) return;
@@ -1570,78 +1670,18 @@
             requests: ['l7Flow_request'],
             performance: ['l7Flow_avgResponseTime', 'l7Flow_avgFirstByteResponseTime'],
             security: ['ccAcl_interceptNum', 'ccManage_interceptNum', 'ccRate_interceptNum'],
-            access: [
-                'l7Flow_request_country', 'l7Flow_request_province',
-                'l7Flow_request_ua_device', 'l7Flow_request_ua_browser',
-                'l7Flow_request_ua_os', 'l7Flow_request_ua'
+            topAnalysis: [
+                'l7Flow_outFlux_country','l7Flow_outFlux_province','l7Flow_outFlux_statusCode','l7Flow_outFlux_domain','l7Flow_outFlux_url','l7Flow_outFlux_resourceType','l7Flow_outFlux_sip','l7Flow_outFlux_referers','l7Flow_outFlux_ua_device','l7Flow_outFlux_ua_browser','l7Flow_outFlux_ua_os','l7Flow_outFlux_ua',
+                'l7Flow_request_country','l7Flow_request_province','l7Flow_request_statusCode','l7Flow_request_domain','l7Flow_request_url','l7Flow_request_resourceType','l7Flow_request_sip','l7Flow_request_referers','l7Flow_request_ua_device','l7Flow_request_ua_browser','l7Flow_request_ua_os','l7Flow_request_ua'
             ],
-            requestAnalysis: [
-                'l7Flow_outFlux_statusCode', 'l7Flow_request_statusCode',
-                'l7Flow_outFlux_domain', 'l7Flow_request_domain',
-                'l7Flow_outFlux_url', 'l7Flow_request_url',
-                'l7Flow_request_resourceType', 'l7Flow_request_sip',
-                'l7Flow_request_referers'
-            ],
-            originPull: ['l7Flow_outFlux_hy', 'l7Flow_outBandwidth_hy', 'l7Flow_request_hy'],
-            functions: ['function_requestCount', 'function_cpuCostTime']
+            originPull: ['l7Flow_outFlux_hy','l7Flow_outBandwidth_hy','l7Flow_request_hy','l7Flow_inFlux_hy','l7Flow_inBandwidth_hy'],
+            functions: ['function_requestCount','function_cpuCostTime']
         };
-
-        const dashboardGroups = {
-            overview: ['traffic', 'bandwidth', 'requests', 'performance'],
-            security: ['security'],
-            access: ['access'],
-            requests: ['requestAnalysis'],
-            origin: ['originPull'],
-            functions: ['functions']
-        };
-
-        const groupMeta = {
-            overview: { title: '核心站点概览', desc: '流量、带宽、请求与性能指标。' },
-            security: { title: '安全防护分析', desc: '只在进入安全分组时请求防护数据。' },
-            access: { title: '访问分析', desc: '国家、省份、设备、浏览器、操作系统与 User-Agent。' },
-            requests: { title: '请求分析', desc: '状态码、域名、URL、资源类型、客户端 IP 与 Referer。' },
-            origin: { title: '源站回源', desc: '观察 EdgeOne 实际回源压力与带宽。' },
-            functions: { title: 'Edge Functions', desc: '函数请求量与 CPU 消耗。' }
-        };
-
-        let activeDashboardGroup = 'overview';
-        let dashboardCache = new Map();
-        let dashboardLoading = false;
 
         const metricLabels = {
-            'l7Flow_flux': '总流量',
-            'l7Flow_inFlux': '客户端请求流量',
-            'l7Flow_outFlux': '响应流量',
-            'l7Flow_bandwidth': '总带宽',
-            'l7Flow_inBandwidth': '请求带宽',
-            'l7Flow_outBandwidth': '响应带宽',
-            'l7Flow_request': '请求数',
-            'l7Flow_avgResponseTime': '平均响应耗时',
-            'l7Flow_avgFirstByteResponseTime': '平均首字节耗时',
-            'ccAcl_interceptNum': '精确防护拦截',
-            'ccManage_interceptNum': '托管规则拦截',
-            'ccRate_interceptNum': '速率限制拦截',
-            'l7Flow_outFlux_country': '国家/地区流量',
-            'l7Flow_request_country': '国家/地区请求数',
-            'l7Flow_outFlux_statusCode': '状态码流量',
-            'l7Flow_request_statusCode': '状态码请求数',
-            'l7Flow_outFlux_domain': '域名流量',
-            'l7Flow_request_domain': '域名请求数',
-            'l7Flow_outFlux_url': 'URL 流量',
-            'l7Flow_request_url': 'URL 请求数',
-            'l7Flow_request_province': '省份请求数',
-            'l7Flow_request_resourceType': '资源类型请求数',
-            'l7Flow_request_sip': '客户端 IP 请求数',
-            'l7Flow_request_referers': 'Referer 请求数',
-            'l7Flow_request_ua_device': '设备请求数',
-            'l7Flow_request_ua_browser': '浏览器请求数',
-            'l7Flow_request_ua_os': '操作系统请求数',
-            'l7Flow_request_ua': 'User-Agent 请求数',
-            'l7Flow_outFlux_hy': '回源流量',
-            'l7Flow_outBandwidth_hy': '回源带宽',
-            'l7Flow_request_hy': '回源请求数',
-            'function_requestCount': '函数请求数',
-            'function_cpuCostTime': 'CPU 消耗时间'
+            'l7Flow_flux':'总流量','l7Flow_inFlux':'客户端请求流量','l7Flow_outFlux':'响应流量','l7Flow_bandwidth':'总带宽','l7Flow_inBandwidth':'请求带宽','l7Flow_outBandwidth':'响应带宽','l7Flow_request':'请求数','l7Flow_avgResponseTime':'平均响应耗时','l7Flow_avgFirstByteResponseTime':'平均首字节耗时','ccAcl_interceptNum':'精确防护拦截','ccManage_interceptNum':'托管规则拦截','ccRate_interceptNum':'速率限制拦截',
+            'l7Flow_outFlux_country':'国家/地区流量','l7Flow_request_country':'国家/地区请求数','l7Flow_outFlux_province':'省份流量','l7Flow_request_province':'省份请求数','l7Flow_outFlux_statusCode':'状态码流量','l7Flow_request_statusCode':'状态码请求数','l7Flow_outFlux_domain':'域名流量','l7Flow_request_domain':'域名请求数','l7Flow_outFlux_url':'URL流量','l7Flow_request_url':'URL请求数','l7Flow_outFlux_resourceType':'资源类型流量','l7Flow_request_resourceType':'资源类型请求数','l7Flow_outFlux_sip':'客户端IP流量','l7Flow_request_sip':'客户端IP请求数','l7Flow_outFlux_referers':'Referer流量','l7Flow_request_referers':'Referer请求数','l7Flow_outFlux_ua_device':'设备流量','l7Flow_request_ua_device':'设备请求数','l7Flow_outFlux_ua_browser':'浏览器流量','l7Flow_request_ua_browser':'浏览器请求数','l7Flow_outFlux_ua_os':'操作系统流量','l7Flow_request_ua_os':'操作系统请求数','l7Flow_outFlux_ua':'User-Agent流量','l7Flow_request_ua':'User-Agent请求数',
+            'l7Flow_outFlux_hy':'回源流量','l7Flow_outBandwidth_hy':'回源带宽','l7Flow_request_hy':'回源请求数','l7Flow_inFlux_hy':'回源请求流量','l7Flow_inBandwidth_hy':'回源请求带宽','function_requestCount':'函数请求数','function_cpuCostTime':'函数CPU消耗'
         };
 
         const metricColors = {
@@ -1682,7 +1722,7 @@
             });
             
             if (shouldRefresh) {
-                invalidateDashboardCache();
+                clearDashboardCache();
                 refreshData(true);
             }
         }
@@ -2062,7 +2102,7 @@
                     if (selectId === 'zoneId') {
                         await onZoneChange();
                     } else if (selectId === 'hostId') {
-                        invalidateDashboardCache();
+                        clearDashboardCache();
                         await refreshData(true);
                     }
                 });
@@ -2128,8 +2168,8 @@
         async function onZoneChange() {
             const zoneId = document.getElementById('zoneId').value;
             await fetchHosts(zoneId);
-            invalidateDashboardCache();
-            await refreshData(true);
+            clearDashboardCache();
+                        await refreshData(true);
         }
 
         async function fetchHosts(zoneId) {
@@ -2171,289 +2211,230 @@
         }
 
         ////ENTRANCE////
-        function setGroupState(state, text) {
-            const el = document.getElementById('group-state');
-            if (!el) return;
-            el.className = `group-state ${state || ''}`.trim();
-            el.innerHTML = `<span class="state-dot"></span><span>${text}</span>`;
-        }
-
-        function getDashboardContextKey() {
-            const range = document.getElementById('timeRange')?.value || 'today';
-            const zone = document.getElementById('zoneId')?.value || '*';
-            const host = document.getElementById('hostId')?.value || '*';
-            return `${range}|${zone}|${host}`;
-        }
-
-        function invalidateDashboardCache() {
-            dashboardCache.clear();
-        }
-
-        function getGroupMetrics(group) {
-            const sections = dashboardGroups[group] || [];
-            return [...new Set(sections.flatMap(section => metricsConfig[section] || []))];
-        }
-
-        function updateGroupCaption(group) {
-            const meta = groupMeta[group] || groupMeta.overview;
-            const title = document.getElementById('group-caption');
-            const desc = document.getElementById('group-description');
-            if (title) title.innerText = meta.title;
-            if (desc) desc.innerText = meta.desc;
-        }
-
-        function activateDashboardGroup(group, options = {}) {
-            if (!groupMeta[group]) return;
-            activeDashboardGroup = group;
-            document.querySelectorAll('.dashboard-tab[data-group]').forEach(btn => {
-                const active = btn.dataset.group === group;
-                btn.classList.toggle('is-active', active);
-                btn.setAttribute('aria-selected', active ? 'true' : 'false');
-            });
-            document.querySelectorAll('.dashboard-panel[data-panel]').forEach(panel => {
-                panel.classList.toggle('is-active', panel.dataset.panel === group);
-            });
-            updateGroupCaption(group);
-            // ECharts 在 display:none 下初始化时尺寸可能为 0，切换后统一 resize。
-            requestAnimationFrame(() => resizeAllCharts());
-            if (options.load !== false) refreshData(Boolean(options.force));
-        }
-
-        function resizeAllCharts() {
-            [chartTraffic, chartBandwidth, chartRequests, chartPerformance, chartSecurity,
-             chartTopMap, chartTopCountry, chartTopProvince, chartTopRequestCountry, chartTopRequestProvince,
-             chartTopStatusCode, chartTopRequestStatusCode, chartTopDomain, chartTopRequestDomain,
-             chartTopUrl, chartTopRequestUrl, chartTopResourceType, chartTopRequestResourceType,
-             chartTopSip, chartTopRequestSip, chartTopReferer, chartTopRequestReferer,
-             chartTopUaDevice, chartTopRequestUaDevice, chartTopUaBrowser, chartTopRequestUaBrowser,
-             chartTopUaOs, chartTopRequestUaOs, chartTopUa, chartTopRequestUa,
-             chartOriginTraffic, chartOriginBandwidth, chartOriginRequests, chartFunctionRequests, chartFunctionCpu]
-             .forEach(chart => chart && chart.resize());
-        }
-
-        function initChart(id) {
-            const el = document.getElementById(id);
-            if (!el || typeof echarts === 'undefined') return null;
-            return echarts.init(el);
-        }
-
         async function initDashboard() {
             await configReady;
+            // Initialize charts
+            chartTraffic = echarts.init(document.getElementById('chart_traffic'));
+            chartBandwidth = echarts.init(document.getElementById('chart_bandwidth'));
+            chartRequests = echarts.init(document.getElementById('chart_requests'));
+            chartPerformance = echarts.init(document.getElementById('chart_performance'));
+            chartSecurity = echarts.init(document.getElementById('chart_security'));
+            chartTopMap = echarts.init(document.getElementById('chart_top_map'));
+            chartTopCountry = echarts.init(document.getElementById('chart_top_country'));
+            chartTopProvince = echarts.init(document.getElementById('chart_top_province'));
+            chartTopUaDevice = echarts.init(document.getElementById('chart_top_ua_device'));
+            chartTopUaBrowser = echarts.init(document.getElementById('chart_top_ua_browser'));
+            chartTopUaOs = echarts.init(document.getElementById('chart_top_ua_os'));
+            chartTopUa = echarts.init(document.getElementById('chart_top_ua'));
+            chartTopRequestCountry = echarts.init(document.getElementById('chart_top_request_country'));
+            chartTopRequestProvince = echarts.init(document.getElementById('chart_top_request_province'));
+            chartTopStatusCode = echarts.init(document.getElementById('chart_top_status_code'));
+            chartTopRequestStatusCode = echarts.init(document.getElementById('chart_top_request_status_code'));
+            chartTopDomain = echarts.init(document.getElementById('chart_top_domain'));
+            chartTopRequestDomain = echarts.init(document.getElementById('chart_top_request_domain'));
+            chartTopUrl = echarts.init(document.getElementById('chart_top_url'));
+            chartTopRequestUrl = echarts.init(document.getElementById('chart_top_request_url'));
+            chartTopResourceType = echarts.init(document.getElementById('chart_top_resource_type'));
+            chartTopRequestResourceType = echarts.init(document.getElementById('chart_top_request_resource_type'));
+            chartTopSip = echarts.init(document.getElementById('chart_top_sip'));
+            chartTopRequestSip = echarts.init(document.getElementById('chart_top_request_sip'));
+            chartTopReferer = echarts.init(document.getElementById('chart_top_referer'));
+            chartTopRequestReferer = echarts.init(document.getElementById('chart_top_request_referer'));
+            chartOriginFlux = echarts.init(document.getElementById('chart_origin_flux'));
+            chartOriginBandwidth = echarts.init(document.getElementById('chart_origin_bandwidth'));
+            chartFunctionRequests = echarts.init(document.getElementById('chart_function_requests'));
+            chartFunctionCpu = echarts.init(document.getElementById('chart_function_cpu'));
 
-            // 所有图表只初始化实例，不会触发接口请求；真正的数据请求由分组切换控制。
-            chartTraffic = initChart('chart_traffic');
-            chartBandwidth = initChart('chart_bandwidth');
-            chartRequests = initChart('chart_requests');
-            chartPerformance = initChart('chart_performance');
-            chartSecurity = initChart('chart_security');
-            chartTopMap = initChart('chart_top_map');
-            chartTopCountry = initChart('chart_top_request_country');
-            chartTopProvince = initChart('chart_top_request_province');
-            chartTopRequestCountry = chartTopCountry;
-            chartTopRequestProvince = chartTopProvince;
-            chartTopStatusCode = initChart('chart_top_status_code');
-            chartTopRequestStatusCode = initChart('chart_top_request_status_code');
-            chartTopDomain = initChart('chart_top_domain');
-            chartTopRequestDomain = initChart('chart_top_request_domain');
-            chartTopUrl = initChart('chart_top_url');
-            chartTopRequestUrl = initChart('chart_top_request_url');
-            chartTopResourceType = initChart('chart_top_request_resource_type');
-            chartTopRequestResourceType = chartTopResourceType;
-            chartTopSip = initChart('chart_top_request_sip');
-            chartTopRequestSip = chartTopSip;
-            chartTopReferer = initChart('chart_top_request_referer');
-            chartTopRequestReferer = chartTopReferer;
-            chartTopUaDevice = initChart('chart_top_request_ua_device');
-            chartTopRequestUaDevice = chartTopUaDevice;
-            chartTopUaBrowser = initChart('chart_top_request_ua_browser');
-            chartTopRequestUaBrowser = chartTopUaBrowser;
-            chartTopUaOs = initChart('chart_top_request_ua_os');
-            chartTopRequestUaOs = chartTopUaOs;
-            chartTopUa = initChart('chart_top_request_ua');
-            chartTopRequestUa = chartTopUa;
-            chartOriginTraffic = initChart('chart_origin_traffic');
-            chartOriginBandwidth = initChart('chart_origin_bandwidth');
-            chartOriginRequests = initChart('chart_origin_requests');
-            chartFunctionRequests = initChart('chart_function_requests');
-            chartFunctionCpu = initChart('chart_function_cpu');
-
+            // 初始化时间范围按钮样式（不刷新数据）
             setTimeRange('today', false);
             initCustomSelects();
             initThemeSwitcher();
             initDashboardTabs();
-            initMouseInteractions();
 
-            const resizeObserver = new ResizeObserver(() => resizeAllCharts());
-            document.querySelectorAll('[id^="chart_"]').forEach(el => resizeObserver.observe(el));
-
-            await fetchZones();
-            await refreshData(true);
-        }
-
-        function initDashboardTabs() {
-            document.querySelectorAll('.dashboard-tab[data-group]').forEach(button => {
-                button.addEventListener('click', () => activateDashboardGroup(button.dataset.group));
-            });
-            document.getElementById('dashboard-refresh')?.addEventListener('click', () => {
-                invalidateDashboardCache();
-                refreshData(true);
-            });
-        }
-
-        function initMouseInteractions() {
-            const spotlight = document.createElement('div');
-            spotlight.className = 'mouse-spotlight';
-            document.body.appendChild(spotlight);
-            const shell = document.querySelector('.app-shell');
-            let raf = 0;
-            window.addEventListener('mousemove', event => {
-                spotlight.style.left = `${event.clientX}px`;
-                spotlight.style.top = `${event.clientY}px`;
-                spotlight.style.opacity = '1';
-                if (!shell) return;
-                cancelAnimationFrame(raf);
-                raf = requestAnimationFrame(() => {
-                    const rect = shell.getBoundingClientRect();
-                    shell.style.setProperty('--mx', `${event.clientX - rect.left}px`);
-                    shell.style.setProperty('--my', `${event.clientY - rect.top}px`);
+            // 使用 ResizeObserver 监听图表容器大小变化
+            const resizeObserver = new ResizeObserver((entries) => {
+                entries.forEach(() => {
+                    chartTraffic && chartTraffic.resize();
+                    chartBandwidth && chartBandwidth.resize();
+                    chartRequests && chartRequests.resize();
+                    chartPerformance && chartPerformance.resize();
+                    chartSecurity && chartSecurity.resize();
+                    chartTopMap && chartTopMap.resize();
+                    chartTopStatusCode && chartTopStatusCode.resize();
+                    chartTopRequestStatusCode && chartTopRequestStatusCode.resize();
+                    chartTopDomain && chartTopDomain.resize();
+                    chartTopRequestDomain && chartTopRequestDomain.resize();
+                    chartTopUrl && chartTopUrl.resize();
+                    chartTopRequestUrl && chartTopRequestUrl.resize();
                 });
-            }, { passive: true });
-            window.addEventListener('mouseleave', () => spotlight.style.opacity = '0');
-        }
-
-        async function refreshData(force = false) {
-            const group = activeDashboardGroup;
-            const contextKey = getDashboardContextKey();
-            const cacheKey = `${contextKey}|${group}`;
-            const cached = dashboardCache.get(cacheKey);
-
-            if (!force && cached?.results) {
-                setGroupState('loaded', '已缓存 · 点击刷新可重新获取');
-                renderDashboardGroup(group, cached.results);
-                resizeAllCharts();
-                return;
-            }
-            if (dashboardLoading) return;
-            dashboardLoading = true;
-            setGroupState('loading', '正在加载当前分组…');
-
-            const { startTime, endTime } = calculateTimeRange();
-            const start = new Date(startTime);
-            const end = new Date(endTime);
-            const isOver14Days = (end - start) > (14 * 24 * 60 * 60 * 1000);
-            let securityStartTime = startTime;
-            let securityEndTime = endTime;
-            if (isOver14Days) {
-                const now = new Date();
-                securityEndTime = formatDate(now);
-                securityStartTime = formatDate(new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000));
-            }
-
-            const metrics = getGroupMetrics(group);
-            const { prevStartTime, prevEndTime } = calculatePreviousRange(startTime, endTime);
-            const { prevStartTime: securityPrevStart, prevEndTime: securityPrevEnd } = calculatePreviousRange(securityStartTime, securityEndTime);
-            const results = {};
-
-            try {
-                await Promise.all(metrics.map(async metric => {
-                    const isSecurity = metricsConfig.security.includes(metric);
-                    const currentStart = isSecurity && isOver14Days ? securityStartTime : startTime;
-                    const currentEnd = isSecurity && isOver14Days ? securityEndTime : endTime;
-                    const previousStart = isSecurity && isOver14Days ? securityPrevStart : prevStartTime;
-                    const previousEnd = isSecurity && isOver14Days ? securityPrevEnd : prevEndTime;
-                    const [current, previous] = await Promise.all([
-                        fetchData(metric, currentStart, currentEnd),
-                        fetchData(metric, previousStart, previousEnd)
-                    ]);
-                    if (current) results[metric] = processData(current, metric);
-                    if (previous) results[`${metric}_prev`] = processData(previous, metric);
-                }));
-
-                dashboardCache.set(cacheKey, { results, loadedAt: Date.now() });
-                renderDashboardGroup(group, results);
-                setGroupState('loaded', `已加载 ${metrics.length} 项数据 · 自动缓存`);
-            } catch (err) {
-                console.error('Dashboard group load error:', err);
-                setGroupState('error', '加载失败，请点击刷新重试');
-            } finally {
-                dashboardLoading = false;
-                resizeAllCharts();
-            }
-        }
-
-        function renderDashboardGroup(group, results) {
-            const sections = dashboardGroups[group] || [];
-            sections.forEach(section => {
-                if (section === 'traffic') updateTrafficSection(results);
-                else if (section === 'bandwidth') updateBandwidthSection(results);
-                else if (section === 'requests') updateRequestsSection(results);
-                else if (section === 'performance') updatePerformanceSection(results);
-                else if (section === 'security') updateSecuritySection(results);
-                else if (section === 'access') updateAccessSection(results);
-                else if (section === 'requestAnalysis') updateRequestAnalysisSection(results);
-                else if (section === 'originPull') updateOriginSection(results);
-                else if (section === 'functions') updateFunctionsSection(results);
             });
+            
+            // 监听所有图表容器
+            document.getElementById('chart_traffic') && resizeObserver.observe(document.getElementById('chart_traffic'));
+            document.getElementById('chart_bandwidth') && resizeObserver.observe(document.getElementById('chart_bandwidth'));
+            document.getElementById('chart_requests') && resizeObserver.observe(document.getElementById('chart_requests'));
+            document.getElementById('chart_performance') && resizeObserver.observe(document.getElementById('chart_performance'));
+            document.getElementById('chart_security') && resizeObserver.observe(document.getElementById('chart_security'));
+            document.getElementById('chart_top_map') && resizeObserver.observe(document.getElementById('chart_top_map'));
+            document.getElementById('chart_top_status_code') && resizeObserver.observe(document.getElementById('chart_top_status_code'));
+            document.getElementById('chart_top_request_status_code') && resizeObserver.observe(document.getElementById('chart_top_request_status_code'));
+            document.getElementById('chart_top_domain') && resizeObserver.observe(document.getElementById('chart_top_domain'));
+            document.getElementById('chart_top_request_domain') && resizeObserver.observe(document.getElementById('chart_top_request_domain'));
+            document.getElementById('chart_top_url') && resizeObserver.observe(document.getElementById('chart_top_url'));
+            document.getElementById('chart_top_request_url') && resizeObserver.observe(document.getElementById('chart_top_request_url'));
+            
+            await fetchZones(); // Fetch zones first
+            clearDashboardCache();
+                        await refreshData(true);
         }
 
-        function updateAccessSection(results) {
-            updateTopMapChart(results);
-            renderTopChart(results, chartTopRequestCountry, 'l7Flow_request_country', countryMap);
-            renderTopChart(results, chartTopRequestProvince, 'l7Flow_request_province', provinceMap);
-            updateTopRequestUaDeviceChart(results);
-            updateTopRequestUaBrowserChart(results);
-            updateTopRequestUaOsChart(results);
-            updateTopRequestUaChart(results);
+        const dashboardCache = new Map();
+        let activeDashboardGroup = 'overview';
+        let dashboardLoading = false;
+        const dashboardGroupMeta = {
+            overview: ['核心站点概览','流量、带宽、请求与性能指标。'],
+            security: ['安全分析','防护拦截与安全趋势。'],
+            access: ['访问分析','国家、省份、设备、浏览器与操作系统。'],
+            requests: ['请求分析','状态码、域名、URL、资源类型、IP 与 Referer。'],
+            origin: ['源站回源','查看 EdgeOne 到源站的压力。'],
+            functions: ['Edge Functions','函数调用与 CPU 消耗。']
+        };
+        const dashboardGroupMetrics = {
+            overview: [...metricsConfig.traffic,...metricsConfig.bandwidth,...metricsConfig.requests,...metricsConfig.performance],
+            security: [...metricsConfig.security],
+            access: [
+                'l7Flow_request_country','l7Flow_outFlux_country','l7Flow_request_province','l7Flow_outFlux_province',
+                'l7Flow_request_ua_device','l7Flow_outFlux_ua_device','l7Flow_request_ua_browser','l7Flow_outFlux_ua_browser',
+                'l7Flow_request_ua_os','l7Flow_outFlux_ua_os','l7Flow_request_ua','l7Flow_outFlux_ua'
+            ],
+            requests: [
+                'l7Flow_outFlux_statusCode','l7Flow_request_statusCode','l7Flow_outFlux_domain','l7Flow_request_domain',
+                'l7Flow_outFlux_url','l7Flow_request_url','l7Flow_outFlux_resourceType','l7Flow_request_resourceType',
+                'l7Flow_outFlux_sip','l7Flow_request_sip','l7Flow_outFlux_referers','l7Flow_request_referers'
+            ],
+            origin: [...metricsConfig.originPull],
+            functions: [...metricsConfig.functions]
+        };
+
+        function setGroupState(type, text) {
+            const el = document.getElementById('group-state');
+            if (!el) return;
+            el.className = `group-state ${type || ''}`;
+            const label = el.querySelector('span:last-child');
+            if (label) label.textContent = text;
         }
 
-        function updateRequestAnalysisSection(results) {
-            renderTopChart(results, chartTopStatusCode, 'l7Flow_outFlux_statusCode');
-            renderTopChart(results, chartTopRequestStatusCode, 'l7Flow_request_statusCode');
-            renderTopChart(results, chartTopDomain, 'l7Flow_outFlux_domain');
-            renderTopChart(results, chartTopRequestDomain, 'l7Flow_request_domain');
-            renderTopChart(results, chartTopUrl, 'l7Flow_outFlux_url');
-            renderTopChart(results, chartTopRequestUrl, 'l7Flow_request_url');
-            updateTopRequestResourceTypeChart(results);
-            updateTopRequestSipChart(results);
-            updateTopRequestRefererChart(results);
+        function updateGroupCaption(group) {
+            const meta = dashboardGroupMeta[group] || dashboardGroupMeta.overview;
+            const title = document.getElementById('group-caption');
+            const desc = document.getElementById('group-description');
+            if (title) title.textContent = meta[0];
+            if (desc) desc.textContent = meta[1] + ' 数据在首次进入后缓存。';
         }
 
-        function updateGenericTimeChart(results, metric, chart, title, unit) {
+        function clearDashboardCache() { dashboardCache.clear(); }
+
+        function renderTimeMetricChart(chart, results, metrics, formatter) {
             if (!chart) return;
-            const data = results[metric];
-            if (!data || data.type !== 'time') return;
-            const values = data.valueData || [];
-            const times = data.timeData || [];
-            const option = {
-                tooltip: { trigger: 'axis' },
-                grid: { left:'3%', right:'4%', bottom:'8%', containLabel:true },
-                xAxis: { type:'category', data:times },
-                yAxis: { type:'value', name:unit || '' },
-                series: [{ name:title, type:'line', smooth:true, showSymbol:false, data:values, areaStyle:{ opacity:.08 } }]
-            };
-            chart.setOption(applyChartTheme(option), true);
-            updateSimpleKpi(metric, data, unit);
-        }
-
-        function updateSimpleKpi(metric, data, unit) {
-            const el = document.getElementById(`kpi_${metric}`);
-            if (!el || !data) return;
-            let value = data.sum ?? data.max ?? 0;
-            if (metric.includes('Bandwidth') || metric.includes('bandwidth')) value = formatBps(value);
-            else if (metric.includes('Flux')) value = formatBytes(value);
-            else value = formatCount(value);
-            el.innerText = unit ? `${value}` : value;
+            let timeData = [];
+            const series = [];
+            metrics.forEach(metric => {
+                const data = results[metric];
+                if (!data || data.type !== 'time') return;
+                if (!timeData.length) timeData = data.timeData || [];
+                series.push({name: metricLabels[metric] || metric,type:'line',smooth:true,data:data.valueData,itemStyle:{color:metricColors[metric] || '#0ea5e9'},areaStyle:{opacity:.08}});
+            });
+            chart.setOption(applyChartTheme({tooltip:{trigger:'axis',formatter:params=>{let s=params[0]?.axisValue||'';params.forEach(p=>s+=`<br/>${p.marker}${p.seriesName}: ${formatter(p.value)}`);return s;}},legend:{data:series.map(x=>x.name),bottom:0},grid:{left:'3%',right:'4%',bottom:'15%',top:'10%',containLabel:true},xAxis:{type:'category',boundaryGap:false,data:timeData,axisLabel:{fontSize:10,rotate:45}},yAxis:{type:'value'},series}),true);
         }
 
         function updateOriginSection(results) {
-            updateGenericTimeChart(results, 'l7Flow_outFlux_hy', chartOriginTraffic, '回源流量', 'B');
-            updateGenericTimeChart(results, 'l7Flow_outBandwidth_hy', chartOriginBandwidth, '回源带宽', 'bps');
-            updateGenericTimeChart(results, 'l7Flow_request_hy', chartOriginRequests, '回源请求数', '次');
+            const flux=results['l7Flow_outFlux_hy'], bw=results['l7Flow_outBandwidth_hy'], req=results['l7Flow_request_hy'];
+            if(flux) document.getElementById('kpi_l7Flow_outFlux_hy').textContent=formatBytes(flux.sum);
+            if(bw) document.getElementById('kpi_l7Flow_outBandwidth_hy').textContent=formatBps(bw.max);
+            if(req) document.getElementById('kpi_l7Flow_request_hy').textContent=formatCount(req.sum);
+            renderTimeMetricChart(chartOriginFlux,results,['l7Flow_outFlux_hy'],formatBytes);
+            renderTimeMetricChart(chartOriginBandwidth,results,['l7Flow_outBandwidth_hy'],formatBps);
         }
 
         function updateFunctionsSection(results) {
-            updateGenericTimeChart(results, 'function_requestCount', chartFunctionRequests, '函数请求数', '次');
-            updateGenericTimeChart(results, 'function_cpuCostTime', chartFunctionCpu, 'CPU 消耗时间', 'ms');
+            const req=results['function_requestCount'], cpu=results['function_cpuCostTime'];
+            if(req) document.getElementById('kpi_function_requestCount').textContent=formatCount(req.sum);
+            if(cpu) document.getElementById('kpi_function_cpuCostTime').textContent=(Number(cpu.sum)||0).toLocaleString(undefined,{maximumFractionDigits:2})+' ms';
+            renderTimeMetricChart(chartFunctionRequests,results,['function_requestCount'],formatCount);
+            renderTimeMetricChart(chartFunctionCpu,results,['function_cpuCostTime'],v=>(Number(v)||0).toLocaleString(undefined,{maximumFractionDigits:2})+' ms');
+        }
+
+        function getMetricTimeForGroup(group) {
+            const all=dashboardGroupMetrics[group]||[];
+            return all;
+        }
+
+        async function loadDashboardGroup(group, force=false) {
+            if (dashboardLoading) return;
+            const key=group;
+            if (!force && dashboardCache.has(key)) {
+                applyDashboardResults(group,dashboardCache.get(key));
+                setGroupState('loaded','已缓存');
+                return;
+            }
+            dashboardLoading=true;
+            setGroupState('loading','加载中...');
+            const {startTime,endTime}=calculateTimeRange();
+            const start=new Date(startTime),end=new Date(endTime);
+            const isOver14Days=(end-start)>14*24*60*60*1000;
+            let securityStart=startTime,securityEnd=endTime;
+            if(isOver14Days){const now=new Date();securityEnd=formatDate(now);securityStart=formatDate(new Date(now.getTime()-14*24*60*60*1000));}
+            const {prevStartTime,prevEndTime}=calculatePreviousRange(startTime,endTime);
+            const {prevStartTime:securityPrevStart,prevEndTime:securityPrevEnd}=calculatePreviousRange(securityStart,securityEnd);
+            const results={};
+            const metrics=getMetricTimeForGroup(group);
+            try {
+                await Promise.all(metrics.flatMap(metric=>{
+                    const isSecurity=metricsConfig.security.includes(metric);
+                    const s=isSecurity&&isOver14Days?securityStart:startTime, e=isSecurity&&isOver14Days?securityEnd:endTime;
+                    const ps=isSecurity&&isOver14Days?securityPrevStart:prevStartTime, pe=isSecurity&&isOver14Days?securityPrevEnd:prevEndTime;
+                    return [fetchData(metric,s,e).then(r=>{if(r)results[metric]=processData(r,metric)}),fetchData(metric,ps,pe).then(r=>{if(r)results[metric+'_prev']=processData(r,metric)})];
+                }));
+                dashboardCache.set(key,results);
+                applyDashboardResults(group,results);
+                setGroupState('loaded','加载完成');
+            } catch(err) {
+                console.error('Dashboard group load error:',err);
+                setGroupState('error','加载失败');
+            } finally { dashboardLoading=false; }
+        }
+
+        function applyDashboardResults(group,results){
+            if(group==='overview'){
+                updateTrafficSection(results);updateBandwidthSection(results);updateRequestsSection(results);updatePerformanceSection(results);
+            } else if(group==='security') updateSecuritySection(results);
+            else if(group==='access' || group==='requests') updateTopAnalysisSection(results);
+            else if(group==='origin') updateOriginSection(results);
+            else if(group==='functions') updateFunctionsSection(results);
+        }
+
+        async function switchDashboardGroup(group,force=false){
+            activeDashboardGroup=group;
+            document.querySelectorAll('.dashboard-tab[data-group]').forEach(btn=>{const active=btn.dataset.group===group;btn.classList.toggle('is-active',active);btn.setAttribute('aria-selected',active?'true':'false')});
+            document.querySelectorAll('.dashboard-panel[data-panel]').forEach(panel=>panel.classList.toggle('is-active',panel.dataset.panel===group));
+            updateGroupCaption(group);
+            await new Promise(requestAnimationFrame);
+            await loadDashboardGroup(group,force);
+            resizeDashboardCharts();
+        }
+
+        async function refreshData(force=true){
+            clearDashboardCache();
+            await loadDashboardGroup(activeDashboardGroup,force);
+        }
+
+        function initDashboardTabs(){
+            document.querySelectorAll('.dashboard-tab[data-group]').forEach(btn=>btn.addEventListener('click',()=>switchDashboardGroup(btn.dataset.group)));
+            document.getElementById('dashboard-refresh')?.addEventListener('click',()=>refreshData(true));
+        }
+
+        function resizeDashboardCharts(){
+            [chartTraffic,chartBandwidth,chartRequests,chartPerformance,chartSecurity,chartTopMap,chartTopCountry,chartTopProvince,chartTopUaDevice,chartTopUaBrowser,chartTopUaOs,chartTopUa,chartTopRequestCountry,chartTopRequestProvince,chartTopStatusCode,chartTopRequestStatusCode,chartTopDomain,chartTopRequestDomain,chartTopUrl,chartTopRequestUrl,chartTopResourceType,chartTopRequestResourceType,chartTopSip,chartTopRequestSip,chartTopReferer,chartTopRequestReferer,chartOriginFlux,chartOriginBandwidth,chartFunctionRequests,chartFunctionCpu].forEach(c=>c&&c.resize());
         }
 
         //1.有使用
@@ -2959,14 +2940,27 @@
 
         //6.有使用
         function updateTopAnalysisSection(results) {
-            // 全球分布、状态码排行、域名流量、域名请求数、URL流量、URL请求数排行
             updateTopMapChart(results);
-            renderTopChart(results, chartTopStatusCode, 'l7Flow_outFlux_statusCode');
-            renderTopChart(results, chartTopRequestStatusCode, 'l7Flow_request_statusCode');
-            renderTopChart(results, chartTopDomain, 'l7Flow_outFlux_domain');
-            renderTopChart(results, chartTopRequestDomain, 'l7Flow_request_domain');
-            renderTopChart(results, chartTopUrl, 'l7Flow_outFlux_url');
-            renderTopChart(results, chartTopRequestUrl, 'l7Flow_request_url');
+            updateTopCountryChart(results);
+            updateTopProvinceChart(results);
+            updateTopUaDeviceChart(results);
+            updateTopUaBrowserChart(results);
+            updateTopUaOsChart(results);
+            updateTopUaChart(results);
+            updateTopRequestCountryChart(results);
+            updateTopRequestProvinceChart(results);
+            updateTopRequestStatusCodeChart(results);
+            updateTopRequestDomainChart(results);
+            updateTopRequestUrlChart(results);
+            updateTopRequestResourceTypeChart(results);
+            updateTopRequestSipChart(results);
+            updateTopRequestRefererChart(results);
+            updateTopStatusCodeChart(results);
+            updateTopDomainChart(results);
+            updateTopUrlChart(results);
+            updateTopResourceTypeChart(results);
+            updateTopSipChart(results);
+            updateTopRefererChart(results);
         }
 
         // DEPRECATED - 以下代码不再使用，保留作为参考
@@ -3981,10 +3975,14 @@
         /** 神秘降级方案结束 **/
 
         // Handle Resize
-        window.addEventListener('resize', () => resizeAllCharts());
+        window.addEventListener('resize', resizeDashboardCharts);
 
         // Start - Entrance
         initDashboard();
     </script>
+<div class="mouse-spotlight" id="mouse-spotlight"></div>
+<script>
+(function(){const spot=document.getElementById("mouse-spotlight"),shell=document.querySelector(".app-shell");if(!spot||!shell)return;let raf=0;window.addEventListener("pointermove",e=>{if(raf)return;raf=requestAnimationFrame(()=>{spot.style.left=e.clientX+"px";spot.style.top=e.clientY+"px";spot.style.opacity="1";const r=shell.getBoundingClientRect();shell.style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%");shell.style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%");raf=0})});window.addEventListener("pointerleave",()=>spot.style.opacity="0")})();
+</script>
 </body>
 </html>
