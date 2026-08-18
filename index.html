@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2141,74 +2142,211 @@
 
         async function fetchZones() {
             try {
-                const response = await fetch('/api/zones');
-                const result = await response.json();
-                const input = document.getElementById('zoneId');
-                const currentVal = input.value || '*';
-                const options = [{ value: '*', label: '全部站点' }];
+                console.info('[Dashboard] loading zones: /api/zones');
 
-                if (result.Zones && result.Zones.length > 0) {
-                    result.Zones.forEach(zone => {
-                        options.push({
-                            value: zone.ZoneId,
-                            label: zone.ZoneName === 'default-pages-zone' ? 'EdgeOne Pages' : zone.ZoneName
-                        });
-                    });
+                const response = await fetch('/api/zones', {
+                    method: 'GET',
+                    cache: 'no-store'
+                });
+
+                if (!response.ok) {
+                    const body = await response.text().catch(() => '');
+                    throw new Error(`/api/zones ${response.status} ${response.statusText}${body ? `: ${body.slice(0, 300)}` : ''}`);
                 }
 
-                const nextVal = options.some(option => option.value === currentVal) ? currentVal : '*';
-                setCustomSelectOptions('zoneId', options, nextVal);
+                const result = await response.json();
+                const zoneData = result?.Zones || result?.Response?.Zones || [];
+
+                if (!Array.isArray(zoneData)) {
+                    throw new Error('站点接口返回格式错误：Zones 不是数组');
+                }
+
+                const input = document.getElementById('zoneId');
+                const currentVal = input?.value || '*';
+
+                const options = [{ value: '*', label: '全部站点' }];
+
+                zoneData.forEach(zone => {
+                    const zoneId = zone?.ZoneId;
+                    const zoneName = zone?.ZoneName;
+
+                    if (!zoneId) return;
+
+                    options.push({
+                        value: zoneId,
+                        label: zoneName === 'default-pages-zone'
+                            ? 'EdgeOne Pages'
+                            : (zoneName || zoneId)
+                    });
+                });
+
+                const nextVal = options.some(option => option.value === currentVal)
+                    ? currentVal
+                    : '*';
+
+                console.info(`[Dashboard] zones loaded: ${zoneData.length}`);
+
+                // 先把站点列表显示出来，不能因为域名请求失败而影响站点选择。
+                setCustomSelectOptions('zoneId', options, nextVal, false);
+
+                // 再加载域名。
                 await fetchHosts(nextVal);
 
             } catch (err) {
-                console.error("Error fetching zones:", err);
-                setCustomSelectOptions('zoneId', [{ value: '*', label: '获取站点失败' }], '*', true);
-                await fetchHosts('*');
+                console.error('[Dashboard] Error fetching zones:', err);
+
+                setCustomSelectOptions(
+                    'zoneId',
+                    [{ value: '*', label: '获取站点失败（点击刷新重试）' }],
+                    '*',
+                    false
+                );
+
+                setCustomSelectOptions(
+                    'hostId',
+                    [{ value: '*', label: '请选择站点' }],
+                    '*',
+                    true
+                );
             }
         }
 
         async function onZoneChange() {
-            const zoneId = document.getElementById('zoneId').value;
+            const zoneId = document.getElementById('zoneId')?.value || '*';
+
+            console.info(`[Dashboard] zone changed -> ${zoneId}`);
+
             await fetchHosts(zoneId);
+
             clearDashboardCache();
-                        await refreshData(true);
+
+            // 站点变化后重新请求当前分组；查询范围仍然保持“当天”。
+            await refreshData(true);
         }
 
         async function fetchHosts(zoneId) {
             const input = document.getElementById('hostId');
-            const currentVal = input.value || '*';
-
-            if (!zoneId || zoneId === '*') {
-                setCustomSelectOptions('hostId', [{ value: '*', label: '全部域名' }], '*', true);
-                return;
-            }
+            const currentVal = input?.value || '*';
 
             try {
-                setCustomSelectOptions('hostId', [{ value: '*', label: '加载中...' }], '*', true);
-                const response = await fetch(`/api/hosts?zoneId=${encodeURIComponent(zoneId)}`);
-                const result = await response.json();
-                const options = [{ value: '*', label: '全部域名' }];
+                setCustomSelectOptions(
+                    'hostId',
+                    [{ value: '*', label: '加载中...' }],
+                    '*',
+                    true
+                );
+
+                let zones = [];
+
+                if (zoneId && zoneId !== '*') {
+                    zones = [zoneId];
+                } else {
+                    // “全部站点”时，后端 /api/hosts 需要具体 ZoneId。
+                    // 因此先读取站点列表，再逐站点获取域名并合并。
+                    const zoneResponse = await fetch('/api/zones', {
+                        method: 'GET',
+                        cache: 'no-store'
+                    });
+
+                    if (!zoneResponse.ok) {
+                        throw new Error(`/api/zones ${zoneResponse.status}`);
+                    }
+
+                    const zoneResult = await zoneResponse.json();
+                    const zoneData = zoneResult?.Zones || zoneResult?.Response?.Zones || [];
+
+                    zones = Array.isArray(zoneData)
+                        ? zoneData.map(zone => zone?.ZoneId).filter(Boolean)
+                        : [];
+                }
+
                 const blockedDomains = ['.edgeone.'];
+                const hostMap = new Map();
 
-                if (result.Hosts && result.Hosts.length > 0) {
-                    result.Hosts
-                        .filter(host => !blockedDomains.some(blocked => host.Host.includes(blocked)))
-                        .filter(host => !isBlockedHost(host.Host))
-                        .forEach(host => {
-                            options.push({ value: host.Host, label: host.Host });
+                // 并发获取各站点域名。
+                const results = await Promise.allSettled(
+                    zones.map(async currentZoneId => {
+                        const response = await fetch(
+                            `/api/hosts?zoneId=${encodeURIComponent(currentZoneId)}`,
+                            {
+                                method: 'GET',
+                                cache: 'no-store'
+                            }
+                        );
+
+                        if (!response.ok) {
+                            throw new Error(
+                                `/api/hosts?zoneId=${currentZoneId} ${response.status}`
+                            );
+                        }
+
+                        return response.json();
+                    })
+                );
+
+                results.forEach(result => {
+                    if (result.status !== 'fulfilled') {
+                        console.warn('[Dashboard] one zone hosts request failed:', result.reason);
+                        return;
+                    }
+
+                    const data = result.value;
+                    const hosts = data?.Hosts || data?.Response?.Hosts || [];
+
+                    if (!Array.isArray(hosts)) return;
+
+                    hosts.forEach(host => {
+                        const hostName = String(
+                            host?.Host ||
+                            host?.Domain ||
+                            host?.Name ||
+                            ''
+                        ).trim();
+
+                        if (!hostName) return;
+                        if (blockedDomains.some(blocked =>
+                            hostName.toLowerCase().includes(blocked)
+                        )) return;
+                        if (isBlockedHost(hostName)) return;
+
+                        hostMap.set(hostName, {
+                            value: hostName,
+                            label: hostName
                         });
-                }
+                    });
+                });
 
-                if (options.length === 1) {
-                    setCustomSelectOptions('hostId', [{ value: '*', label: '暂无子域名' }], '*', true);
-                    return;
-                }
+                const options = [
+                    { value: '*', label: '全部域名' },
+                    ...Array.from(hostMap.values()).sort((a, b) =>
+                        a.label.localeCompare(b.label)
+                    )
+                ];
 
-                const nextVal = options.some(option => option.value === currentVal) ? currentVal : '*';
-                setCustomSelectOptions('hostId', options, nextVal, false);
+                const nextVal = options.some(option => option.value === currentVal)
+                    ? currentVal
+                    : '*';
+
+                console.info(
+                    `[Dashboard] hosts loaded: ${hostMap.size} (zone=${zoneId || '*'})`
+                );
+
+                setCustomSelectOptions(
+                    'hostId',
+                    options,
+                    nextVal,
+                    false
+                );
+
             } catch (err) {
-                console.error("Error fetching hosts:", err);
-                setCustomSelectOptions('hostId', [{ value: '*', label: '获取域名失败' }], '*', true);
+                console.error('[Dashboard] Error fetching hosts:', err);
+
+                setCustomSelectOptions(
+                    'hostId',
+                    [{ value: '*', label: '获取域名失败（可重试）' }],
+                    '*',
+                    false
+                );
             }
         }
 
@@ -2501,8 +2639,24 @@
                 refreshButton.addEventListener('click', async (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-                    console.info(`[Dashboard] refresh group -> ${activeDashboardGroup}`);
+
+                    console.info(`[Dashboard] refresh -> group=${activeDashboardGroup}`);
+
                     try {
+                        // 如果站点列表还没成功，先重试站点和域名。
+                        const zoneInput = document.getElementById('zoneId');
+                        const zoneLabel = document.querySelector('#zoneId-trigger [data-select-label]')?.innerText || '';
+
+                        if (
+                            zoneInput &&
+                            (
+                                zoneLabel.includes('获取站点失败') ||
+                                zoneInput.value === ''
+                            )
+                        ) {
+                            await fetchZones();
+                        }
+
                         await refreshData(true);
                     } catch (err) {
                         console.error('[Dashboard] refresh failed:', err);
