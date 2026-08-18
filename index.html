@@ -1397,6 +1397,8 @@
                         <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">资源类型请求 TOP10</h3></div><div class="p-5"><div id="chart_top_request_resource_type" class="w-full h-[280px]"></div></div></div>
                         <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">客户端 IP TOP10</h3></div><div class="p-5"><div id="chart_top_request_sip" class="w-full h-[280px]"></div></div></div>
                         <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">Referer TOP10</h3></div><div class="p-5"><div id="chart_top_request_referer" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">客户端 IP 流量 TOP10</h3></div><div class="p-5"><div id="chart_top_sip" class="w-full h-[280px]"></div></div></div>
+                        <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">Referer 流量 TOP10</h3></div><div class="p-5"><div id="chart_top_referer" class="w-full h-[280px]"></div></div></div>
                         <div class="chart-card rounded-[22px]"><div class="p-5 border-b border-slate-100"><h3 class="font-semibold text-slate-800">请求资源类型（流量）</h3></div><div class="p-5"><div id="chart_top_resource_type" class="w-full h-[280px]"></div></div></div>
                     </div>
                 </div>
@@ -2211,39 +2213,57 @@
         }
 
         ////ENTRANCE////
+        // 安全初始化 ECharts：
+        // 某些分组的图表容器可能不存在时，不允许一个 echarts.init(null)
+        // 直接中断整个 Dashboard 初始化，否则会导致 /api/zones、标签事件等后续代码全部不执行。
+        function initChart(id) {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.warn(`[Dashboard] chart container not found: #${id}`);
+                return null;
+            }
+            try {
+                return echarts.init(el);
+            } catch (err) {
+                console.error(`[Dashboard] failed to init chart #${id}:`, err);
+                return null;
+            }
+        }
+
         async function initDashboard() {
+
             await configReady;
             // Initialize charts
-            chartTraffic = echarts.init(document.getElementById('chart_traffic'));
-            chartBandwidth = echarts.init(document.getElementById('chart_bandwidth'));
-            chartRequests = echarts.init(document.getElementById('chart_requests'));
-            chartPerformance = echarts.init(document.getElementById('chart_performance'));
-            chartSecurity = echarts.init(document.getElementById('chart_security'));
-            chartTopMap = echarts.init(document.getElementById('chart_top_map'));
-            chartTopCountry = echarts.init(document.getElementById('chart_top_country'));
-            chartTopProvince = echarts.init(document.getElementById('chart_top_province'));
-            chartTopUaDevice = echarts.init(document.getElementById('chart_top_ua_device'));
-            chartTopUaBrowser = echarts.init(document.getElementById('chart_top_ua_browser'));
-            chartTopUaOs = echarts.init(document.getElementById('chart_top_ua_os'));
-            chartTopUa = echarts.init(document.getElementById('chart_top_ua'));
-            chartTopRequestCountry = echarts.init(document.getElementById('chart_top_request_country'));
-            chartTopRequestProvince = echarts.init(document.getElementById('chart_top_request_province'));
-            chartTopStatusCode = echarts.init(document.getElementById('chart_top_status_code'));
-            chartTopRequestStatusCode = echarts.init(document.getElementById('chart_top_request_status_code'));
-            chartTopDomain = echarts.init(document.getElementById('chart_top_domain'));
-            chartTopRequestDomain = echarts.init(document.getElementById('chart_top_request_domain'));
-            chartTopUrl = echarts.init(document.getElementById('chart_top_url'));
-            chartTopRequestUrl = echarts.init(document.getElementById('chart_top_request_url'));
-            chartTopResourceType = echarts.init(document.getElementById('chart_top_resource_type'));
-            chartTopRequestResourceType = echarts.init(document.getElementById('chart_top_request_resource_type'));
-            chartTopSip = echarts.init(document.getElementById('chart_top_sip'));
-            chartTopRequestSip = echarts.init(document.getElementById('chart_top_request_sip'));
-            chartTopReferer = echarts.init(document.getElementById('chart_top_referer'));
-            chartTopRequestReferer = echarts.init(document.getElementById('chart_top_request_referer'));
-            chartOriginFlux = echarts.init(document.getElementById('chart_origin_flux'));
-            chartOriginBandwidth = echarts.init(document.getElementById('chart_origin_bandwidth'));
-            chartFunctionRequests = echarts.init(document.getElementById('chart_function_requests'));
-            chartFunctionCpu = echarts.init(document.getElementById('chart_function_cpu'));
+            chartTraffic = initChart('chart_traffic');
+            chartBandwidth = initChart('chart_bandwidth');
+            chartRequests = initChart('chart_requests');
+            chartPerformance = initChart('chart_performance');
+            chartSecurity = initChart('chart_security');
+            chartTopMap = initChart('chart_top_map');
+            chartTopCountry = initChart('chart_top_country');
+            chartTopProvince = initChart('chart_top_province');
+            chartTopUaDevice = initChart('chart_top_ua_device');
+            chartTopUaBrowser = initChart('chart_top_ua_browser');
+            chartTopUaOs = initChart('chart_top_ua_os');
+            chartTopUa = initChart('chart_top_ua');
+            chartTopRequestCountry = initChart('chart_top_request_country');
+            chartTopRequestProvince = initChart('chart_top_request_province');
+            chartTopStatusCode = initChart('chart_top_status_code');
+            chartTopRequestStatusCode = initChart('chart_top_request_status_code');
+            chartTopDomain = initChart('chart_top_domain');
+            chartTopRequestDomain = initChart('chart_top_request_domain');
+            chartTopUrl = initChart('chart_top_url');
+            chartTopRequestUrl = initChart('chart_top_request_url');
+            chartTopResourceType = initChart('chart_top_resource_type');
+            chartTopRequestResourceType = initChart('chart_top_request_resource_type');
+            chartTopSip = initChart('chart_top_sip');
+            chartTopRequestSip = initChart('chart_top_request_sip');
+            chartTopReferer = initChart('chart_top_referer');
+            chartTopRequestReferer = initChart('chart_top_request_referer');
+            chartOriginFlux = initChart('chart_origin_flux');
+            chartOriginBandwidth = initChart('chart_origin_bandwidth');
+            chartFunctionRequests = initChart('chart_function_requests');
+            chartFunctionCpu = initChart('chart_function_cpu');
 
             // 初始化时间范围按钮样式（不刷新数据）
             setTimeRange('today', false);
@@ -2285,7 +2305,11 @@
             
             await fetchZones(); // Fetch zones first
             clearDashboardCache();
-                        await refreshData(true);
+
+            // 初始化默认分组：只请求“概览”所需数据。
+            // 其他分组在用户首次点击时才请求。
+            console.info('[Dashboard] initialization complete, loading overview...');
+            await refreshData(true);
         }
 
         const dashboardCache = new Map();
@@ -2429,8 +2453,31 @@
         }
 
         function initDashboardTabs(){
-            document.querySelectorAll('.dashboard-tab[data-group]').forEach(btn=>btn.addEventListener('click',()=>switchDashboardGroup(btn.dataset.group)));
-            document.getElementById('dashboard-refresh')?.addEventListener('click',()=>refreshData(true));
+            const tabs = document.querySelectorAll('.dashboard-tab[data-group]');
+            console.info(`[Dashboard] binding ${tabs.length} group tabs`);
+
+            tabs.forEach(btn => {
+                btn.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const group = btn.dataset.group;
+                    if (!group) return;
+
+                    console.info(`[Dashboard] switch group -> ${group}`);
+                    await switchDashboardGroup(group);
+                });
+            });
+
+            const refreshButton = document.getElementById('dashboard-refresh');
+            if (refreshButton) {
+                refreshButton.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    console.info(`[Dashboard] refresh group -> ${activeDashboardGroup}`);
+                    await refreshData(true);
+                });
+            }
         }
 
         function resizeDashboardCharts(){
