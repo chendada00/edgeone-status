@@ -230,19 +230,6 @@
             left: 0;
             right: 0;
             top: calc(100% + 0.45rem);
-            max-height: 15rem;
-            overflow-y: auto;
-            border-radius: 1rem;
-            border: 1px solid rgba(226, 232, 240, 0.95);
-            background: rgba(255,255,255,0.98);
-            padding: 0.35rem;
-            box-shadow: 0 22px 56px -34px rgba(15, 23, 42, 0.48);
-            opacity: 0;
-            transform: translateY(-0.25rem) scale(0.98);
-            pointer-events: none;
-            transition: opacity 0.16s ease, transform 0.16s ease;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
         }
 
         .custom-select.is-open .custom-select-menu {
@@ -705,7 +692,6 @@
 /* Dashboard group navigation */
 /* .dashboard-tabs{position:sticky;top:.75rem;z-index:50;overflow-x:auto;scrollbar-width:none;background:rgba(255,255,255,.82);border:1px solid rgba(226,232,240,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 16px 40px -30px rgba(15,23,42,.45);padding:.45rem;border-radius:1.15rem} */
 .dashboard-tabs {
-    position: relative;
     z-index: 10;
 }
 .dashboard-tabs::-webkit-scrollbar{display:none}
@@ -728,7 +714,9 @@
 .mouse-spotlight{position:fixed;left:0;top:0;width:360px;height:360px;border-radius:50%;pointer-events:none;z-index:0;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(56,189,248,.12),transparent 68%);opacity:0;transition:opacity .25s ease}
 .app-shell{position:relative;overflow:visible;--mx:50%;--my:0%}
 .app-shell::after{content:'';position:absolute;inset:0;border-radius:28px;pointer-events:none;background:radial-gradient(430px circle at var(--mx) var(--my),rgba(56,189,248,.065),transparent 68%);z-index:0}
-.app-shell>*{position:relative;z-index:1}
+.app-shell>*{
+    position:relative;
+}
 @media(max-width:640px){.dashboard-tab{padding:.52rem .7rem;font-size:.78rem}.dashboard-tabs{top:.4rem}.mouse-spotlight{display:none}}
 
     </style>
