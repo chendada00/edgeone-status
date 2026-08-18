@@ -273,7 +273,7 @@
             };
         }
 
-        // Fetch API with Caching
+        // 修改后的 fetchMetricData
         async function fetchMetricData(metric, forceRefresh = false) {
             const now = Date.now();
             const { startTime, endTime } = getTimeRangeParams();
@@ -286,15 +286,22 @@
                 return dataCache[cacheKey].data;
             }
 
-            const url = new URL('/traffic', window.location.origin);
-            url.searchParams.append('metric', metric);
-            url.searchParams.append('startTime', startTime);
-            url.searchParams.append('endTime', endTime);
-            if (zoneId !== '*') url.searchParams.append('zoneId', zoneId);
-            if (host !== '*') url.searchParams.append('host', host);
+            // 使用相对路径拼接参数，避免 URL 域及前缀解析异常
+            const params = new URLSearchParams({
+                metric,
+                startTime,
+                endTime
+            });
+            if (zoneId && zoneId !== '*') params.append('zoneId', zoneId);
+            if (host && host !== '*') params.append('host', host);
+
+            const reqUrl = `traffic?${params.toString()}`;
 
             try {
-                const res = await fetch(url);
+                const res = await fetch(reqUrl);
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
                 const json = await res.json();
                 dataCache[cacheKey] = { timestamp: now, data: json };
                 return json;
