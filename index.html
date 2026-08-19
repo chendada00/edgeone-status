@@ -231,6 +231,8 @@
             max-height: 15rem;
             max-height: 15rem;
             overflow-y: auto;
+            overflow-x: auto;
+            overscroll-behavior: contain;
             border-radius: 1rem;
             border: 1px solid rgba(226, 232, 240, 0.95);
             background: rgba(255,255,255,0.98);
@@ -252,13 +254,15 @@
 
         .custom-select-option {
             display: flex;
-            width: 100%;
+            width: max-content;
+            min-width: 100%;
             align-items: center;
             justify-content: space-between;
             border-radius: 0.75rem;
             padding: 0.62rem 0.7rem;
             font-size: 0.875rem;
             font-weight: 600;
+            white-space: nowrap;
             color: #475569;
             transition: background 0.16s ease, color 0.16s ease;
         }
@@ -877,7 +881,7 @@
                             </svg>
                         </div>
                         <div>
-                            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Qingyu Analytics</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Cc Analytics</p>
                             <h1 id="page-header" class="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">伴随流量分析</h1>
                             <p class="mt-1 max-w-2xl text-sm leading-6 text-slate-500">面向 EdgeOne 与 Pages 的站点流量、请求与安全分析面板。</p>
                         </div>
@@ -1440,7 +1444,7 @@
         <div class="glass-panel footer-panel rounded-[22px] px-5 py-5 text-sm text-slate-500">
             <div class="footer-content">
                 <div class="footer-primary">
-                    <a id="icp-link" href="https://beian.miit.gov.cn/" target="_blank" class="footer-link hover:text-sky-600 transition-colors hidden">陕ICP备2024028531号</a>
+                    <a id="icp-link" href="https://beian.miit.gov.cn/" target="_blank" class="footer-link hover:text-sky-600 transition-colors hidden">京ICP备2022017849号-4</a>
                     <!-- <span id="icp-separator" class="footer-separator hidden sm:inline">|</span>
                     <span>本项目基于开源项目 <a href="https://github.com/MoForgt/edgeone-status" target="_blank" class="font-medium text-slate-800 hover:text-sky-600 transition-colors">MoForgt/edgeone-status</a> 构建，遵循原项目许可协议。</span> -->
                 </div>
@@ -1456,8 +1460,8 @@
             <span id="theme-toggle-label">浅色模式</span>
         </button>
         <div class="theme-menu" role="menu" aria-label="切换主题">
-            <button type="button" class="theme-option" data-theme-option="light" role="menuitem">浅色</button>
-            <button type="button" class="theme-option" data-theme-option="dark" role="menuitem">深色</button>
+            <button type="button" class="theme-option" data-theme-option="light" role="menuitem">浅色模式</button>
+            <button type="button" class="theme-option" data-theme-option="dark" role="menuitem">暗色模式</button>
         </div>
     </div>
 
@@ -2088,6 +2092,7 @@
 
             menu.style.width = `${rect.width}px`;
             menu.style.minWidth = `${minWidth}px`;
+            menu.style.maxWidth = `${Math.max(180, window.innerWidth - viewportPadding * 2)}px`;
 
             // 先按按钮下方定位，必要时自动向上展开。
             const menuHeight = Math.min(menu.scrollHeight || 240, 240);
@@ -2461,14 +2466,49 @@
                 return null;
             }
             try {
-                return echarts.init(el);
+                if (!window.echarts) return null;
+                return window.echarts.init(el);
             } catch (err) {
                 console.error(`[Dashboard] failed to init chart #${id}:`, err);
                 return null;
             }
         }
 
+        async function ensureEchartsLoaded() {
+            if (window.echarts) return true;
+
+            console.warn('[Dashboard] ECharts is not available, trying fallback loader...');
+            const sources = [
+                'assets/echarts.min.js',
+                'https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js'
+            ];
+
+            for (const src of sources) {
+                try {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = src;
+                        script.async = true;
+                        script.onload = resolve;
+                        script.onerror = () => reject(new Error(`ECharts load failed: ${src}`));
+                        document.head.appendChild(script);
+                    });
+                    if (window.echarts) {
+                        console.info(`[Dashboard] ECharts loaded: ${src}`);
+                        return true;
+                    }
+                } catch (err) {
+                    console.warn('[Dashboard] ECharts source failed:', src, err);
+                }
+            }
+            console.error('[Dashboard] ECharts could not be loaded. KPI/data cards will still be rendered.');
+            return false;
+        }
+
         async function initDashboard() {
+
+            // ECharts 加载失败不能阻断站点、标签和 KPI 数据。
+            await ensureEchartsLoaded();
 
             // /api/config 只负责站点配置，不阻塞 Dashboard 初始化。
             // 即使 config 较慢、异常或被缓存卡住，标签和数据查询也应该可以正常工作。
@@ -2837,7 +2877,7 @@
                 yAxis: { type: 'value', name: unit },
                 series: series
             };
-            chartTraffic.setOption(applyChartTheme(option));
+            chartTraffic?.setOption(applyChartTheme(option));
         }
 
         //2.有使用
@@ -2906,7 +2946,7 @@
                 yAxis: { type: 'value', name: unit },
                 series: series
             };
-            chartBandwidth.setOption(applyChartTheme(option));
+            chartBandwidth?.setOption(applyChartTheme(option));
         }
 
         //4.有使用
@@ -2981,7 +3021,7 @@
                 yAxis: { type: 'value', name: unit },
                 series: series
             };
-            chartRequests.setOption(applyChartTheme(option));
+            chartRequests?.setOption(applyChartTheme(option));
         }
 
         //5.有使用
@@ -3027,7 +3067,7 @@
                 yAxis: { type: 'value', name: 'ms' },
                 series: series
             };
-            chartPerformance.setOption(applyChartTheme(option));
+            chartPerformance?.setOption(applyChartTheme(option));
         }
 
         //5.1. Security Section
@@ -3108,7 +3148,7 @@
                 yAxis: { type: 'value' },
                 series: series
             };
-            chartSecurity.setOption(applyChartTheme(option));
+            chartSecurity?.setOption(applyChartTheme(option));
         }
 
         //通用处理
@@ -3210,7 +3250,7 @@
                     }
                 ]
             };
-            chartInstance.setOption(applyChartTheme(option));
+            chartInstance?.setOption(applyChartTheme(option));
         };
 
         function updateTopMapChart(results) {
@@ -3267,7 +3307,7 @@
                 ]
             };
 
-            chartTopMap.setOption(applyChartTheme(option));
+            chartTopMap?.setOption(applyChartTheme(option));
         }
 
         //6.有使用
@@ -3375,7 +3415,7 @@
                 ]
             };
 
-            chartTopCountry.setOption(option);
+            chartTopCountry?.setOption(option);
         }
 
         function updateTopProvinceChart(results) {
@@ -3413,7 +3453,7 @@
                 ]
             };
 
-            chartTopProvince.setOption(option);
+            chartTopProvince?.setOption(option);
         }
 
         function updateTopStatusCodeChart(results) {
@@ -3451,7 +3491,7 @@
                 ]
             };
 
-            chartTopStatusCode.setOption(option);
+            chartTopStatusCode?.setOption(option);
         }
 
         function updateTopDomainChart(results) {
@@ -3489,7 +3529,7 @@
                 ]
             };
 
-            chartTopDomain.setOption(option);
+            chartTopDomain?.setOption(option);
         }
 
         function updateTopUrlChart(results) {
@@ -3540,7 +3580,7 @@
                 ]
             };
 
-            chartTopUrl.setOption(option);
+            chartTopUrl?.setOption(option);
         }
 
         function updateTopResourceTypeChart(results) {
@@ -3578,7 +3618,7 @@
                 ]
             };
 
-            chartTopResourceType.setOption(option);
+            chartTopResourceType?.setOption(option);
         }
 
         function updateTopSipChart(results) {
@@ -3616,7 +3656,7 @@
                 ]
             };
 
-            chartTopSip.setOption(option);
+            chartTopSip?.setOption(option);
         }
 
         //无调用，作为备用方案来处理
@@ -3673,7 +3713,7 @@
                 ]
             };
 
-            chartTopReferer.setOption(option);
+            chartTopReferer?.setOption(option);
         }
 
         function updateTopUaDeviceChart(results) {
@@ -3711,7 +3751,7 @@
                 ]
             };
 
-            chartTopUaDevice.setOption(option);
+            chartTopUaDevice?.setOption(option);
         }
 
         function updateTopUaBrowserChart(results) {
@@ -3749,7 +3789,7 @@
                 ]
             };
 
-            chartTopUaBrowser.setOption(option);
+            chartTopUaBrowser?.setOption(option);
         }
 
         function updateTopUaOsChart(results) {
@@ -3787,7 +3827,7 @@
                 ]
             };
 
-            chartTopUaOs.setOption(option);
+            chartTopUaOs?.setOption(option);
         }
 
         function updateTopUaChart(results) {
@@ -3828,7 +3868,7 @@
                 ]
             };
 
-            chartTopUa.setOption(option);
+            chartTopUa?.setOption(option);
         }
 
         function updateTopRequestCountryChart(results) {
@@ -3866,7 +3906,7 @@
                 ]
             };
 
-            chartTopRequestCountry.setOption(option);
+            chartTopRequestCountry?.setOption(option);
         }
 
         function updateTopRequestProvinceChart(results) {
@@ -3904,7 +3944,7 @@
                 ]
             };
 
-            chartTopRequestProvince.setOption(option);
+            chartTopRequestProvince?.setOption(option);
         }
 
         function updateTopRequestStatusCodeChart(results) {
@@ -3942,7 +3982,7 @@
                 ]
             };
 
-            chartTopRequestStatusCode.setOption(option);
+            chartTopRequestStatusCode?.setOption(option);
         }
 
         function updateTopRequestDomainChart(results) {
@@ -3980,7 +4020,7 @@
                 ]
             };
 
-            chartTopRequestDomain.setOption(option);
+            chartTopRequestDomain?.setOption(option);
         }
 
         function updateTopRequestUrlChart(results) {
@@ -4018,7 +4058,7 @@
                 ]
             };
 
-            chartTopRequestUrl.setOption(option);
+            chartTopRequestUrl?.setOption(option);
         }
 
         function updateTopRequestResourceTypeChart(results) {
@@ -4056,7 +4096,7 @@
                 ]
             };
 
-            chartTopRequestResourceType.setOption(option);
+            chartTopRequestResourceType?.setOption(option);
         }
 
         function updateTopRequestSipChart(results) {
@@ -4094,7 +4134,7 @@
                 ]
             };
 
-            chartTopRequestSip.setOption(option);
+            chartTopRequestSip?.setOption(option);
         }
 
         //无调用，作为备份使用
@@ -4147,7 +4187,7 @@
                 ]
             };
 
-            chartTopRequestReferer.setOption(option);
+            chartTopRequestReferer?.setOption(option);
         }
 
         function updateTopRequestUaDeviceChart(results) {
@@ -4185,7 +4225,7 @@
                 ]
             };
 
-            chartTopRequestUaDevice.setOption(option);
+            chartTopRequestUaDevice?.setOption(option);
         }
 
         function updateTopRequestUaBrowserChart(results) {
@@ -4223,7 +4263,7 @@
                 ]
             };
 
-            chartTopRequestUaBrowser.setOption(option);
+            chartTopRequestUaBrowser?.setOption(option);
         }
 
         function updateTopRequestUaOsChart(results) {
@@ -4261,7 +4301,7 @@
                 ]
             };
 
-            chartTopRequestUaOs.setOption(option);
+            chartTopRequestUaOs?.setOption(option);
         }
 
         function updateTopRequestUaChart(results) {
@@ -4302,7 +4342,7 @@
                 ]
             };
 
-            chartTopRequestUa.setOption(option);
+            chartTopRequestUa?.setOption(option);
         }
         /** 神秘降级方案结束 **/
 
